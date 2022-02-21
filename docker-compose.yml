@@ -1,0 +1,24 @@
+version: '3.5'
+
+services:
+
+  #nome do servico
+  loja-django:
+
+    #construido a partir de uma imagem customizada em ./image
+    image: loja-django
+    
+    #nome do conteiner
+    container_name: loja-django
+
+    #pastas compartilhadas
+    volumes:
+      #pasta do codigo fonte da aplicacao
+      - "./app:/root"
+
+    #porta a ser exposta
+    ports:
+      - 8080:8080
+  
+    #artifício para manter o container aberto
+    tty: true
