@@ -10,3 +10,7 @@ python3 manage.py startapp produto
 python3 manage.py startapp pedido
 python3 manage.py startapp perfil
 exit
+cd /root/
+cd ..
+pip3 install django-debug-toolbar
+exit

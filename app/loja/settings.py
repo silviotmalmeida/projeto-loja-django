@@ -16,6 +16,11 @@ from pathlib import Path
 from django.contrib.messages import constants
 
 
+# FIXME: manter somente em ambiente de desenvolvimento
+# importação para o debug-toolbar
+import socket
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,6 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+
+
+    # FIXME: manter somente em ambiente de desenvolvimento
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +62,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+
+    # FIXME: manter somente em ambiente de desenvolvimento
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'loja.urls'
@@ -59,7 +73,7 @@ ROOT_URLCONF = 'loja.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  # definindo a pasta de templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,9 +136,9 @@ USE_TZ = True
 
 # definindo as pastas de arquivos estáticos
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'templates/static'
+STATIC_ROOT = BASE_DIR / 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static/',
+    BASE_DIR / 'templates/static',
 ]
 
 # definindo as pastas de arquivos de mídia
@@ -140,8 +154,18 @@ MESSAGE_TAGS = {
     constants.INFO: 'alert-info',
 }
 
+# definindo as regras da sessão
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # duração da sessão
+# regra para salvar automaticamente a sessão a cada requisição
+SESSION_SAVE_EVERY_REQUEST = False
+# SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer' # alteração do serializador default para permitir salvar objetos na sessão
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# FIXME: manter somente em ambiente de desenvolvimento
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = [ip[:-1] + '1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
