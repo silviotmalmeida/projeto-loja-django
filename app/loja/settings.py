@@ -41,6 +41,8 @@ ALLOWED_HOSTS = ['0.0.0.0']
 # Application definition
 
 INSTALLED_APPS = [
+    'produto',  # declarando o app produto
+    'pedido',  # declarando o app pedido
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -14,3 +14,19 @@ cd /root/
 cd ..
 pip3 install django-debug-toolbar
 exit
+cd /root/
+python3 manage.py makemigrations
+python3 manage.py migrate
+exit
+cd /root/
+python3 manage.py makemigrations
+python3 manage.py migrate
+exit
+cd /root/
+python3 manage.py makemigrations
+python3 manage.py migrate
+exit
+cd /root/
+python3 manage.py makemigrations
+python3 manage.py migrate
+exit
