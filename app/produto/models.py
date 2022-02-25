@@ -6,6 +6,10 @@ from PIL import Image
 from django.conf import settings
 # importando a biblioteca de navegação de arquivos
 import os
+# importando a biblioteca de criação de slugs
+from django.utils.text import slugify
+# biblioteca de números aleatórios
+import random
 
 
 # criando a model de Produto
@@ -27,7 +31,8 @@ class Produto(models.Model):
 
     # criando o atributo slug como texto único
     # atributo para definir um apelido amigável
-    slug = models.SlugField(unique=True, verbose_name='Apelido')
+    slug = models.SlugField(unique=True, blank=True,
+                            null=True, verbose_name='Slug')
 
     # criando o atributo preco_marketing como float
     preco_marketing = models.FloatField(verbose_name='Preço (R$)')
@@ -40,7 +45,7 @@ class Produto(models.Model):
     tipo = models.CharField(default='V',
                             max_length=1,
                             choices=(
-                                ('V', 'Variação'),
+                                ('V', 'Variável'),
                                 ('S', 'Simples'),
                             ),
                             verbose_name='Tipo')
@@ -58,6 +63,13 @@ class Produto(models.Model):
 
      # sobrescrevendo o método do django de salvar no BD
     def save(self, *args, **kwargs):
+
+        # se o slug não foi informado
+        if not self.slug:
+            # cria um slug com o nome e um número aleatório
+            slug = f'{slugify(self.nome)}-{random.randint(1, 100)}'
+            # atribuindo o slug
+            self.slug = slug
 
         # utilizando as definições da superclasse
         super().save(*args, **kwargs)

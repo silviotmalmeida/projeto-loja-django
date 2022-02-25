@@ -34,3 +34,7 @@ cd /root/
 python3 manage.py makemigrations
 python3 manage.py migrate
 exit
+cd /root/
+python3 manage.py makemigrations
+python3 manage.py migrate
+exit
