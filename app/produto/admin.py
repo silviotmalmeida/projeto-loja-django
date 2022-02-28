@@ -18,8 +18,8 @@ class ProdutoAdmin(admin.ModelAdmin):
     inlines = [VariacaoInline]
 
     # definindo as colunas a serem exibidas
-    list_display = ('id', 'nome', 'preco_marketing',
-                    'preco_marketing_promocional', 'tipo')
+    list_display = ('id', 'nome', 'descricao_curta', 'formatted_preco_marketing',
+                    'formatted_preco_marketing_promocional', 'tipo')
 
     # definindo em quais colunas serão colocados links de edição
     list_display_links = ('id', 'nome')
@@ -31,7 +31,7 @@ class ProdutoAdmin(admin.ModelAdmin):
     search_fields = ('nome',)
 
     # definindo as colunas liberadas para ediçao na tela de listagem
-    list_editable = ('preco_marketing', 'preco_marketing_promocional', 'tipo',)
+    list_editable = ()
 
 
 # definindo as configurações de exibição da Variacao na área administrativa

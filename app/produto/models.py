@@ -61,6 +61,16 @@ class Produto(models.Model):
         # nome no plural
         verbose_name_plural = 'Produtos'
 
+    # definindo função para exibir o preco_marketing formatado na listagem
+    def formatted_preco_marketing(self):
+        return f'R$ {self.preco_marketing:.2f}'.replace('.', ',')
+    formatted_preco_marketing.short_description = 'Preço (R$)'
+
+    # definindo função para exibir o preco_marketing_promocional formatado na listagem
+    def formatted_preco_marketing_promocional(self):
+        return f'R$ {self.preco_marketing_promocional:.2f}'.replace('.', ',')
+    formatted_preco_marketing_promocional.short_description = 'Preço Promocional (R$)'
+
      # sobrescrevendo o método do django de salvar no BD
     def save(self, *args, **kwargs):
 
