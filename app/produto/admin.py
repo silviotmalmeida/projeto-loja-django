@@ -56,6 +56,4 @@ class VariacaoAdmin(admin.ModelAdmin):
 
 # registrando as models para exibição na área administrativa
 admin.site.register(Produto, ProdutoAdmin)
-
-# foi definido que somente se dará a gestão das variações dentro do formulário de produtos
-# admin.site.register(Variacao, VariacaoAdmin)
+admin.site.register(Variacao, VariacaoAdmin)

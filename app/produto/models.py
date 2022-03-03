@@ -74,34 +74,10 @@ class Produto(models.Model):
     # sobrescrevendo o método do django de salvar no BD
     def save(self, *args, **kwargs):
 
-        # obtendo as variaçoes cadastradas
-        variacoes = Variacao.objects.filter(id_produto=self)
-
-        if (variacoes):
-
-            self.tipo = 'V'
-
-            lower_price = 100000.00
-            lower_price_promotional = 100000.00
-            for variacao in variacoes:
-
-                print(variacao.preco_marketing)
-
-                if(variacao.preco_marketing < lower_price):
-                    lower_price = variacao.preco_marketing
-                    lower_price_promotional = variacao.preco_marketing_promocional
-
-            self.preco_marketing = lower_price
-            self.preco_marketing_promocional = lower_price_promotional
-
-        else:
-
-            self.tipo = 'S'
-
-            # se o preco_marketing_promocional não foi informado
-            if not self.preco_marketing_promocional:
-                # atribui o mesmo valor do preco_marketing
-                self.preco_marketing_promocional = self.preco_marketing
+        # se o preco_marketing_promocional não foi informado
+        if not self.preco_marketing_promocional:
+            # atribui o mesmo valor do preco_marketing
+            self.preco_marketing_promocional = self.preco_marketing
 
         # se o slug não foi informado
         if not self.slug:
@@ -110,13 +86,49 @@ class Produto(models.Model):
             # atribuindo o slug
             self.slug = slug
 
-        # utilizando as definições da superclasse
+        # utilizando as definições da superclasse para salvar no BD
+        super().save(*args, **kwargs)
+
+        # etapa para atualização dos preços do produto baseado no menor preço promocional
+        # obtendo as variaçoes cadastradas
+        variacoes = Variacao.objects.filter(id_produto=self)
+
+        # se existirem variações
+        if (variacoes):
+            # altera o tipo do produto para variável
+            self.tipo = 'V'
+
+            # inicializando as variáveis de menor preço
+            lower_price = 1000000.00
+            lower_price_promotional = 1000000.00
+
+            # iterando no array de variações
+            for variacao in variacoes:
+
+                print()
+
+                # se o preço promocional da variação for menor que o menor preço
+                if(variacao.preco_marketing_promocional < lower_price_promotional):
+                    # atualiza as variáveis de menor preço
+                    lower_price = variacao.preco_marketing
+                    lower_price_promotional = variacao.preco_marketing_promocional
+
+            # atribui os preços ajustados ao produto
+            self.preco_marketing = lower_price
+            self.preco_marketing_promocional = lower_price_promotional
+
+        # senão
+        else:
+            # altera o tipo do produto para simples
+            self.tipo = 'S'
+
+        # utilizando as definições da superclasse para salvar no BD
         super().save(*args, **kwargs)
 
         # se existir imagem a ser submetida
         if self.imagem:
             # processando a imagem submetida
-            self.resize_image(self.imagem)        
+            self.resize_image(self.imagem)
 
     # criando método estático para processamento da imagem do post
     @staticmethod
@@ -186,25 +198,19 @@ class Variacao(models.Model):
             # atribui o mesmo valor do preco_marketing
             self.preco_marketing_promocional = self.preco_marketing
 
+        # utilizando as definições da superclasse para salvar no BD
+        super().save(*args, **kwargs)
 
-
-        # obtendo as variaçoes cadastradas
+        # etapa de atualização dos preços do produto
+        # obtendo os dados do produto relativo à variação
         produto = self.id_produto
 
-        print(produto.preco_marketing)
-        print(produto.preco_marketing_promocional)
+        # se o preço promocional da variação for inferior ao do produto
+        if(self.preco_marketing_promocional < produto.preco_marketing_promocional):
 
-        if(self.preco_marketing < produto.preco_marketing):
-     
+            # atualiza os preços do produto
             produto.preco_marketing = self.preco_marketing
             produto.preco_marketing_promocional = self.preco_marketing_promocional
 
-        print(produto.preco_marketing)
-        print(produto.preco_marketing_promocional)
-
+        # salva no BD
         produto.save()
-
-
-        # utilizando as definições da superclasse
-        super().save(*args, **kwargs)
-
