@@ -8,6 +8,9 @@ from django.views import View
 # importando a model Produto
 from .models import Produto
 
+# biblioteca de números aleatórios
+import random
+
 
 # definindo a view List
 class List(ListView):
@@ -89,4 +92,16 @@ class Finalize(View):
 # definindo a view loadtestdata
 # tem a função de carregar uma massa de dados de teste
 def loadtestdata(request):
-    pass
+
+    print("entrei")
+
+    # criando os produtos
+    for x in range(50):
+        # cadastrando o novo produto
+        # produto = Produto.objects.create(
+        #     nome=f'Produto {x+1}',
+        #     descricao_curta=f'Decrição curta do Produto {x+1}',
+        #     descricao_longa=f'Decrição longa do Produto {x+1}',
+        #     )
+        # produto.save()
+        print(x)

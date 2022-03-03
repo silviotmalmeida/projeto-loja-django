@@ -24,5 +24,5 @@ urlpatterns = [
     path('finalize/', views.Finalize.as_view(), name='finalize'),
 
     # definindo a url para carregamento de dados de teste
-    path('loadtestdata', views.loadtestdata, name='loadtestdata'),
+    path('loadtestdata/', views.loadtestdata, name='loadtestdata'),
 ]

@@ -36,6 +36,7 @@
 
             <!-- se existir promoção, exibe o preço cortado e o preço promocional destacado  -->
             {% if produto.preco_marketing_promocional < produto.preco_marketing %}
+              <span class="product-text-price">A partir de: </span>  
               <span class="product-price">R$ {{ produto.preco_marketing_promocional }}</span>
               <span class="product-old-price text-muted">R$ {{ produto.preco_marketing }}</span>
 

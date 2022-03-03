@@ -38,3 +38,10 @@ cd /root/
 python3 manage.py makemigrations
 python3 manage.py migrate
 exit
+cd /root/
+python3 manage.py createsuperuser
+python3 manage.py createsuperuser
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py createsuperuser
+exit
