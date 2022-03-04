@@ -45,3 +45,18 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 python3 manage.py createsuperuser
 exit
+python3 manage.py makemigrations
+cd /root/
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py createsuperuser
+exit
+cd /root/
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py createsuperuser
+exit
+cd /root/
+python3 manage.py migrate
+python3 manage.py createsuperuser
+exit

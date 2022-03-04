@@ -38,7 +38,8 @@ class Produto(models.Model):
     preco_marketing = models.FloatField(default=0, verbose_name='Preço (R$)')
 
     # criando o atributo preco_marketing_promocional como float, com valor default 0
-    preco_marketing_promocional = models.FloatField(default=0, verbose_name='Preço Promocional (R$)')
+    preco_marketing_promocional = models.FloatField(
+        default=0, verbose_name='Preço Promocional (R$)')
 
     # criando o atributo tipo com opções pré-definidas
     tipo = models.CharField(default='S',
@@ -89,42 +90,6 @@ class Produto(models.Model):
             slug = f'{slugify(self.nome)}-{random.randint(1, 100)}'
             # atribuindo o slug
             self.slug = slug
-
-        # utilizando as definições da superclasse para salvar no BD
-        super().save(*args, **kwargs)
-
-        # etapa para atualização dos preços do produto baseado no menor preço promocional
-        # obtendo as variaçoes cadastradas
-        variacoes = Variacao.objects.filter(id_produto=self)
-
-        # se existirem variações
-        if (variacoes):
-            # altera o tipo do produto para variável
-            self.tipo = 'V'
-
-            # inicializando as variáveis de menor preço
-            lower_price = 1000000.00
-            lower_price_promotional = 1000000.00
-
-            # iterando no array de variações
-            for variacao in variacoes:
-
-                print()
-
-                # se o preço promocional da variação for menor que o menor preço
-                if(variacao.preco_marketing_promocional < lower_price_promotional):
-                    # atualiza as variáveis de menor preço
-                    lower_price = variacao.preco_marketing
-                    lower_price_promotional = variacao.preco_marketing_promocional
-
-            # atribui os preços ajustados ao produto
-            self.preco_marketing = lower_price
-            self.preco_marketing_promocional = lower_price_promotional
-
-        # senão
-        else:
-            # altera o tipo do produto para simples
-            self.tipo = 'S'
 
         # utilizando as definições da superclasse para salvar no BD
         super().save(*args, **kwargs)
@@ -210,16 +175,46 @@ class Variacao(models.Model):
         # utilizando as definições da superclasse para salvar no BD
         super().save(*args, **kwargs)
 
-        # etapa de atualização dos preços do produto
+        # atualizando os preços do produto
+        self.refreshProductPrice()
+
+
+    # método para atualização dos preços do produto baseado no menor preço promocional de suas variações
+    def refreshProductPrice(self):
+        
         # obtendo os dados do produto relativo à variação
         produto = self.id_produto
 
-        # se o preço promocional da variação for inferior ao do produto
-        if(self.preco_promocional < produto.preco_marketing_promocional):
+        # obtendo as variaçoes cadastradas neste produto
+        variacoes = Variacao.objects.filter(id_produto=self.id_produto)
 
-            # atualiza os preços do produto
-            produto.preco_marketing = self.preco
-            produto.preco_marketing_promocional = self.preco_promocional
+        # se existirem variações
+        if (variacoes):
+
+            # altera o tipo do produto para variável
+            produto.tipo = 'V'
+
+            # inicializando as variáveis de menor preço
+            lower_price = 1000000.00
+            lower_price_promotional = 1000000.00
+
+            # iterando no array de variações
+            for variacao in variacoes:
+
+                # se o preço promocional da variação for menor que o menor preço
+                if(variacao.preco_promocional < lower_price_promotional):
+                    # atualiza as variáveis de menor preço
+                    lower_price = variacao.preco
+                    lower_price_promotional = variacao.preco_promocional
+
+            # atribui os preços ajustados ao produto
+            produto.preco_marketing = lower_price
+            produto.preco_marketing_promocional = lower_price_promotional
+
+        # senão
+        else:
+            # altera o tipo do produto para simples
+            produto.tipo = 'S'
 
         # salva no BD
         produto.save()
