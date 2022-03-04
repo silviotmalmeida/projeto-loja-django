@@ -60,3 +60,7 @@ cd /root/
 python3 manage.py migrate
 python3 manage.py createsuperuser
 exit
+cd /root/
+python3 manage.py migrate
+python3 manage.py createsuperuser
+exit

@@ -1,6 +1,9 @@
 <!-- extende o arquivo do template global base.html -->
 {% extends 'base.html' %}
 
+<!-- carregando o módulo de filtros personalizados -->
+{% load customizedFilters %}
+
 <!-- definindo o title a ser inserido no base.html -->
 {% block title %}Listagem de Produtos{% endblock %}
 
@@ -41,12 +44,12 @@
 
             <!-- se existir promoção, exibe o preço cortado e o preço promocional destacado  -->
             {% if produto.preco_marketing_promocional < produto.preco_marketing %}              
-              <span class="product-price">R$ {{ produto.preco_marketing_promocional }}</span>
-              <span class="product-old-price text-muted">R$ {{ produto.preco_marketing }}</span>
+              <span class="product-price">{{ produto.preco_marketing_promocional|currency_format }}</span>
+              <span class="product-old-price text-muted">{{ produto.preco_marketing|currency_format }}</span>
 
             <!-- senão, exibe o preço destacado  -->
             {% else %}
-              <span class="product-price">R$ {{ produto.preco_marketing_promocional }}</span>
+              <span class="product-price">{{ produto.preco_marketing_promocional|currency_format }}</span>
 
             {% endif %}
           </div>
@@ -56,7 +59,8 @@
         <div
           class="card-footer bg-transparent border-top-light-custom text-center"
         >
-          <a href="post.html" class="btn btn-primary btn-sm m-1 btn-block">
+          <!-- inserindo o link para a página de detalhes -->
+          <a href="{{ produto.slug }}" class="btn btn-primary btn-sm m-1 btn-block">
             <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             Comprar
           </a>
@@ -65,6 +69,13 @@
 
       {% endfor %}
     </div>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col">
+    <!-- carregando a paginação definida em partial/_pagination.html -->
+    {% include 'partials/_pagination.html' %}
   </div>
 </div>
 

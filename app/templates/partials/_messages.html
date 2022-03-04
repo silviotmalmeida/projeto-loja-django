@@ -1,0 +1,14 @@
+<!-- arquivo parcial responsável por exibir as mensagens do template global do sistema -->
+
+<!-- se existirem mensagens a serem exibidas -->
+{% if messages %}
+    <br>
+    <!-- iterando sobre o array de mensagens -->
+    {% for message in messages %}
+
+        <!-- exibe a mensagem na tela -->
+        <div class="alert {{ message.tags }}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}

@@ -10,6 +10,8 @@ import os
 from django.utils.text import slugify
 # biblioteca de números aleatórios
 import random
+# importação biblioteca de funções genéricas
+from utils import utils
 
 
 # criando a model de Produto
@@ -63,12 +65,12 @@ class Produto(models.Model):
 
     # definindo função para exibir o preco_marketing formatado na listagem
     def formatted_preco_marketing(self):
-        return f'R$ {self.preco_marketing:.2f}'.replace('.', ',')
+        return utils.currency_format(self.preco_marketing)
     formatted_preco_marketing.short_description = 'Preço (R$)'
 
     # definindo função para exibir o preco_marketing_promocional formatado na listagem
     def formatted_preco_marketing_promocional(self):
-        return f'R$ {self.preco_marketing_promocional:.2f}'.replace('.', ',')
+        return utils.currency_format(self.preco_marketing_promocional)
     formatted_preco_marketing_promocional.short_description = 'Preço Promocional (R$)'
 
     # sobrescrevendo o método do django de salvar no BD
@@ -178,10 +180,10 @@ class Variacao(models.Model):
         # atualizando os preços do produto
         self.refreshProductPrice()
 
-
     # método para atualização dos preços do produto baseado no menor preço promocional de suas variações
+
     def refreshProductPrice(self):
-        
+
         # obtendo os dados do produto relativo à variação
         produto = self.id_produto
 

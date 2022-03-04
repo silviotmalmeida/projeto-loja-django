@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 
 # importando os tipos de views a serem utilizadas
 from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.views import View
 
 # importando as models Produto e Variacao
@@ -26,74 +27,38 @@ class List(ListView):
     # determinando o nome do objeto a ser passado ao template
     context_object_name = 'produtos'
 
-    # # sobreescrevendo o método do django de criação do contexto
-    # def get_context_data(self, **kwargs):
-
-    #     # obtendo o contexto padrão da superclasse
-    #     context = super().get_context_data(**kwargs)
-
-    #     # obtendo as categorias cadastradas
-    #     categories = Categoria.objects.all()
-
-    #     # adicionando as categorias no contexto do template
-    #     context['categories'] = categories
-
-    #     return context
-
-    # # sobreescrevendo a query padrão do django
-    # def get_queryset(self):
-
-    #     # chamando o método da superclasse
-    #     qs = super().get_queryset()
-
-    #     # incrementando na consulta os dados da categoria para melhorar a performance,
-    #     # visto que informações da categoria serão exibidos no template
-    #     qs = qs.select_related('id_categoria')
-
-    #     # filtrando por publicado=True e ordenando de forma decrescente por id
-    #     qs = qs.order_by('-id').filter(publicado=True)
-
-    #     # criando um campo anotado para calcular os comentários publicados do post
-    #     qs = qs.annotate(
-
-    #         # calculando os comentários que o atributo publicado=True
-    #         comentarios_publicados=Count(
-    #             Case(
-    #                 When(comentario__publicado=True, then=1)
-    #             )
-    #         )
-    #     )
-
-    #     # retornando a query
-    #     return qs
 
 # definindo a view Detail
+class Detail(DetailView):
+    # atribuindo a model a ser utilizada
+    model = Produto
 
+    # atribuindo o template a ser utilizado
+    template_name = 'produto/detail.html'
 
-class Detail(View):
-    pass
+    # determinando o nome do objeto a ser passado ao template
+    context_object_name = 'produto'
+
+    # determinando o termo a ser considerado como slug na definição da url
+    slug_url_kwarg = 'slug'
+
 
 # definindo a view AddCart
-
-
 class AddCart(View):
     pass
 
+
 # definindo a view RemoveCart
-
-
 class RemoveCart(View):
     pass
 
+
 # definindo a view ShowCart
-
-
 class ShowCart(View):
     pass
 
+
 # definindo a view Finalize
-
-
 class Finalize(View):
     pass
 
