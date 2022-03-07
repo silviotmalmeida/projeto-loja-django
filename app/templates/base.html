@@ -15,6 +15,9 @@
     {% include 'partials/_nav.html' %}
 
     <main class="container mt-4 mb-4">
+      <!-- carregando as mensagens definidas em partials/_messages.html -->
+      {% include 'partials/_messages.html' %}
+
       <!-- carregando o conteudo definido nos templates -->
       {% block content %}{% endblock %}
     </main>

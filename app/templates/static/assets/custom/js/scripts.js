@@ -8,7 +8,7 @@
   // obtendo o span com o preço
   variation_preco = document.getElementById("variation-preco");
 
-  // obtendo o span com o preço promocional
+  // obtendo o span com o preço tachado
   variation_preco_promocional = document.getElementById(
     "variation-preco-promocional"
   );
@@ -28,18 +28,35 @@
     // atribui o preço baseado na variação selecionada
     preco = this.options[this.selectedIndex].getAttribute("data-preco");
 
+    // convertendo o preço para float
+    preco_float = preco.replace("R$ ", "").replace(",",".");
+    preco_float = Number.parseFloat(preco_float);
+    
     // atribui o preço promocional baseado na variação selecionada
     preco_promocional = this.options[this.selectedIndex].getAttribute(
       "data-preco-promocional"
     );
 
-    // atualizando o span de preço
-    variation_preco.innerHTML = preco;
+    // convertendo o preço promocional para float
+    preco_promocional_float = preco_promocional.replace("R$ ", "").replace(",",".");
+    preco_promocional_float = Number.parseFloat(preco_promocional_float);
 
-    // se o span de preço promocional existir
-    if (variation_preco_promocional) {
-      // atualizando o span de preço promocional
+    
+
+    // se o preço for maior que o preço promocional
+    if (preco_float > preco_promocional_float) {
+
+      // atualizando o span de preço
+      variation_preco.innerHTML = preco;
+      // atualizando o span de preço tachado
       variation_preco_promocional.innerHTML = preco_promocional;
+    }
+    else{
+
+      // atualizando o span de preço
+      variation_preco.innerHTML = "";
+      // atualizando o span de preço
+      variation_preco_promocional.innerHTML = preco;
     }
   });
 })();

@@ -161,8 +161,13 @@ class Variacao(models.Model):
         # nome no plural
         verbose_name_plural = 'Variações'
 
-     # sobrescrevendo o método do django de salvar no BD
+    # sobrescrevendo o método do django de salvar no BD
     def save(self, *args, **kwargs):
+
+        # se o nome não foi inserido
+        if not self.nome:
+            # atribui o mesmo nome do produto
+            self.nome = self.id_produto.nome
 
         # se o preco_promocional não foi informado
         if not self.preco_promocional:
@@ -180,8 +185,16 @@ class Variacao(models.Model):
         # atualizando os preços do produto
         self.refreshProductPrice()
 
-    # método para atualização dos preços do produto baseado no menor preço promocional de suas variações
+    # sobrescrevendo o método do django de remover do BD
+    def delete(self, *args, **kwargs):
 
+        # utilizando as definições da superclasse para remover do BD
+        super().delete(*args, **kwargs)
+
+        # atualizando os preços do produto
+        self.refreshProductPrice()
+
+    # método para atualização dos preços do produto baseado no menor preço promocional de suas variações
     def refreshProductPrice(self):
 
         # obtendo os dados do produto relativo à variação
@@ -217,6 +230,10 @@ class Variacao(models.Model):
         else:
             # altera o tipo do produto para simples
             produto.tipo = 'S'
+
+            # atribui os preços zerados ao produto
+            produto.preco_marketing = 0.00
+            produto.preco_marketing_promocional = 0.00
 
         # salva no BD
         produto.save()

@@ -30,32 +30,36 @@
             <p class="lead">{{ produto.descricao_curta }}</p>
             <p class="lead">
 
-                <!-- se existir promoção, exibe o preço cortado e o preço promocional destacado -->
-                {% if produto.preco_marketing_promocional < produto.preco_marketing %}
-                    <!-- foram definidos ids para utilização de javascript na atualização dos preços  -->
-                    <span id="variation-preco" class="lead product-price">{{ produto.preco_marketing_promocional|currency_format }}</span>
-                    <span id="variation-preco-promocional"
-                        class="lead product-old-price text-muted">{{ produto.preco_marketing|currency_format }}</span>
-
-
-                <!-- senão, exibe o preço destacado  -->
-                {% else %}
-                    <!-- foram definidos ids para utilização de javascript na atualização dos preços -->
-                    <span id="variation-preco" class="lead product-price">{{ produto.preco_marketing|currency_format }}</span>
-                
-                {% endif %}
+            <!-- inserindo o span do preço -->
+            <span id="variation-preco-promocional" class="lead product-price"></span>
+            
+            <!-- inserindo o span do preço tachado -->
+            <span id="variation-preco" class="lead product-old-price text-muted"></span>
 
             </p>
 
-            <form action="/addtocart/" id="form-add-to-cart">
+            <form action="{% url 'produto:addcart' %}" id="form-add-to-cart">
                 <div class="form-group">
+
+
+                    <!-- inserindo as variações do produto -->
                     <select id="select-variacoes" name="vid" class="form-control form-control-lg">
-                        <option data-preco="R$ 59,90" data-preco-promocional="R$ 39,90" value="45">P
-                        </option>
-                        <option data-preco="R$ 51,90" data-preco-promocional="R$ 49,90" value="45">M
-                        </option>
-                        <option data-preco="R$ 52,90" data-preco-promocional="R$ 89,90" value="45">G
-                        </option>
+                            
+                            <!-- inserindo a opção default -->
+                            <option data-preco=""
+                                data-preco-promocional=""
+                                value="" selected="selected">{% if produto.tipo == 'S' %}Produto indisponível{% else %}Selecione um produto{% endif %}
+                            </option>
+                        
+                        <!-- iterando sobre o array de variações -->
+                        {% for variacao in produto.variacao_set.all %}
+                        
+                            <!-- inserindo as variações -->
+                            <option data-preco="{{ variacao.preco|currency_format }}"
+                                data-preco-promocional="{{ variacao.preco_promocional|currency_format }}"
+                                value="{{ variacao.id }}">{{ variacao.nome }}
+                            </option>
+                        {% endfor %}
                     </select>
                 </div>
 

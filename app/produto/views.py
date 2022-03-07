@@ -1,10 +1,14 @@
 # importação default
-from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 
 # importando os tipos de views a serem utilizadas
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
+
+# importando as mensagens do django
+from django.contrib import messages
 
 # importando as models Produto e Variacao
 from .models import Produto, Variacao
@@ -45,7 +49,38 @@ class Detail(DetailView):
 
 # definindo a view AddCart
 class AddCart(View):
-    pass
+    def get(self, *args, **kwargs):
+
+        # obtendo o id da variação selecionada a partir da url
+        variacao_id = self.request.GET.get('vid')
+
+        # se o id da variação não estiver na requisição
+        if not variacao_id:
+
+            # obtendo a url da página que originou a requisição
+            if 'HTTP_REFERER' in self.request.META:
+                # se existir, popula a variável
+                origin_url = self.request.META['HTTP_REFERER']
+
+                # envia mensagem de erro
+                messages.error(self.request, 'Produto indisponível ou não selecionado!')
+
+            # senão
+            else:
+
+                # envia mensagem de erro
+                messages.error(self.request, 'Produto inválido!')
+
+                # popula com o endereço do início
+                origin_url = 'produto:list'
+
+            # redireciona para a página que originou a requisição
+            return redirect(origin_url)
+
+        # obtendo a variação selecionada, caso não exista retorna um 404
+        variacao = get_object_or_404(Variacao, id=variacao_id)
+
+        return HttpResponse(f'{variacao.id_produto} {variacao.nome}')
 
 
 # definindo a view RemoveCart
@@ -97,4 +132,4 @@ def loadtestdata(request):
                 estoque=random.randint(0, 100),)
 
     # redirecionando para a página de início
-    return redirect('list')
+    return redirect('produto:list')

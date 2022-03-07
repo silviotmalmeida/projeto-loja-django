@@ -6,7 +6,8 @@ from . import views
 
 
 # definindo o nome do produto como namespace
-# app_name = 'produto'
+# deve ser utilizado o app_name:url_name
+app_name = 'produto'
 
 # definindo os endpoints do app
 urlpatterns = [
