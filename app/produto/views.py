@@ -49,30 +49,35 @@ class Detail(DetailView):
 
 # definindo a view AddCart
 class AddCart(View):
+
+    # definindo a resposta a uma requisição get
     def get(self, *args, **kwargs):
 
         # obtendo o id da variação selecionada a partir da url
         variacao_id = self.request.GET.get('vid')
 
+        # obtendo a url da página que originou a requisição
+        if 'HTTP_REFERER' in self.request.META:
+            # se existir, popula a variável
+            origin_url = self.request.META['HTTP_REFERER']
+
+        # senão
+        else:
+            # popula com o endereço do início
+            origin_url = 'produto:list'
+
         # se o id da variação não estiver na requisição
         if not variacao_id:
-
-            # obtendo a url da página que originou a requisição
+            # se existir página que originou a requisição
             if 'HTTP_REFERER' in self.request.META:
-                # se existir, popula a variável
-                origin_url = self.request.META['HTTP_REFERER']
-
                 # envia mensagem de erro
-                messages.error(self.request, 'Produto indisponível ou não selecionado!')
+                messages.error(
+                    self.request, 'Produto indisponível ou não selecionado!')
 
             # senão
             else:
-
                 # envia mensagem de erro
                 messages.error(self.request, 'Produto inválido!')
-
-                # popula com o endereço do início
-                origin_url = 'produto:list'
 
             # redireciona para a página que originou a requisição
             return redirect(origin_url)
@@ -80,7 +85,79 @@ class AddCart(View):
         # obtendo a variação selecionada, caso não exista retorna um 404
         variacao = get_object_or_404(Variacao, id=variacao_id)
 
-        return HttpResponse(f'{variacao.id_produto} {variacao.nome}')
+        # obtendo o produto da variacao
+        produto = variacao.id_produto
+
+        # obtendo a url da imagem do produto
+        image = '' if not produto.imagem else produto.imagem.name
+
+        if variacao.estoque < 1:
+            # envia mensagem de erro
+            messages.error(
+                self.request, 'Infelizmente o produto selecionado não tem estoque suficiente.')
+
+            # redireciona para a página que originou a requisição
+            return redirect(origin_url)
+
+        # se o carrinho da sessão ainda não existir
+        if not self.request.session.get('cart'):
+
+            # cria o carrinho vazio na sessão
+            self.request.session['cart'] = {}
+            self.request.session.save()
+
+        # obtendo o carrinho da sessão
+        cart = self.request.session['cart']
+
+        # se já existir variação de mesmo tipo no carrinho
+        if variacao_id in cart:
+
+            # obtendo a quantidade presente no carrinho
+            qtd_cart = cart[variacao_id]['qtd']
+            # incrementando a quantidade
+            qtd_cart += 1
+
+            # se não houver estoque suficiente
+            if variacao.estoque < qtd_cart:
+                # envia mensagem de erro
+                messages.error(
+                    self.request, f'Estoque insuficiente para inclusão. Foram mantidos {variacao.estoque} no carrinho.')
+
+                # readequa a quantidade ao estoque disponível
+                qtd_cart = variacao.estoque
+
+            # atualizando a quantidade e preços no carrinho
+            cart[variacao_id]['qtd'] = qtd_cart
+            cart[variacao_id]['preco_total'] = variacao.preco * qtd_cart
+            cart[variacao_id]['preco_total_promocional'] = variacao.preco_promocional * qtd_cart
+
+        # senão
+        else:
+
+            # inserindo a variação no carrinho
+            cart[variacao_id] = {
+                'produto_id': produto.id,
+                'produto_nome': produto.nome,
+                'variacao_id': variacao.id,
+                'variacao_nome': variacao.nome,
+                'preco_unitario': variacao.preco,
+                'preco_unitario_promocional': variacao.preco_promocional,
+                'preco_total': variacao.preco,
+                'preco_total_promocional': variacao.preco_promocional,
+                'qtd': 1,
+                'slug': produto.slug,
+                'imagem': image,
+            }
+
+        # salvando o status da sessão
+        self.request.session.save()
+
+        # envia mensagem de sucesso
+        messages.success(
+            self.request, 'Produto inserido no carrinho.')
+
+        # redireciona para a página que originou a requisição
+        return redirect(origin_url)
 
 
 # definindo a view RemoveCart
@@ -90,7 +167,12 @@ class RemoveCart(View):
 
 # definindo a view ShowCart
 class ShowCart(View):
-    pass
+
+    # definindo a resposta a uma requisição get
+    def get(self, *args, **kwargs):
+
+        return render(self.request, 'produto/cart.html')
+    
 
 
 # definindo a view Finalize

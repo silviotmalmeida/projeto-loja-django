@@ -1,0 +1,68 @@
+<!-- extende o arquivo do template global base.html -->
+{% extends 'base.html' %}
+
+<!-- carregando o módulo de filtros personalizados -->
+{% load customizedFilters %}
+
+<!-- definindo o title a ser inserido no base.html -->
+{% block title %}Carrinho de Compras{% endblock %}
+
+<!-- criando o bloco content a ser inserido no base.html -->
+{% block content %}
+
+{% if request.session.cart %}
+
+<div class="table-responsive">
+    <table class="table">
+        <tr>
+            <th class="d-none d-lg-block">Imagem</th>
+            <th>Produto</th>
+            <th>V.</th>
+            <th>QTD.</th>
+            <th>Total</th>
+        </tr>
+
+        {% for item in request.session.cart %}
+        <tr>
+            <td class="d-none d-lg-block">
+                <img class="cart-img" src="{{ item.imagem }}">
+            </td>
+            <td>
+                <a href="#">
+                    {{ item.produto_nome }}
+                </a>
+
+                <a class="ml-3" href="#">
+                    <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
+                </a>
+            </td>
+            <td>{{ item.variacao_nome }}</td>
+            <td>
+                {{ item.quantidade }} x
+                {% if item.preco_unitario_promocional %}
+                {{ item.preco_unitario_promocional }}
+                {% else %}
+                {{ item.preco_unitario }}
+                {% endif %}
+            </td>
+
+            {% if item.preco_quantitativo_promocional %}
+            <td>{{ item.preco_quantitativo_promocional }}</td>
+            {% else %}
+            <td>{{ item.preco_quantitativo }}</td>
+            {% endif %}
+
+        </tr>
+        {% endfor %}
+
+
+    </table>
+</div>
+
+{% else %}
+
+Carrinho vazio...
+
+{% endif %}
+
+{% endblock %}
