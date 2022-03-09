@@ -1,67 +1,95 @@
-<!-- extende o arquivo do template global base.html -->
+{# extende o arquivo do template global base.html #}
 {% extends 'base.html' %}
 
-<!-- carregando o módulo de filtros personalizados -->
+{# carregando o módulo de filtros personalizados #}
 {% load customizedFilters %}
 
-<!-- definindo o title a ser inserido no base.html -->
+{# definindo o title a ser inserido no base.html #}
 {% block title %}Carrinho de Compras{% endblock %}
 
-<!-- criando o bloco content a ser inserido no base.html -->
+{# criando o bloco content a ser inserido no base.html #}
 {% block content %}
 
+{{ request.session.cart }}
+
+{# se o carrinho existir na sessão #}
 {% if request.session.cart %}
 
-<div class="table-responsive">
-    <table class="table">
-        <tr>
-            <th class="d-none d-lg-block">Imagem</th>
-            <th>Produto</th>
-            <th>V.</th>
-            <th>QTD.</th>
-            <th>Total</th>
-        </tr>
+    {# renderizando a tabela com os itens do carrinho #}
+    <div class="table-responsive">
+        <table class="table">
+            {# cabeçalho da tabela #}
+            <tr>
+                <th class="d-none d-lg-block">Imagem</th>
+                <th>Produto</th>
+                <th>Variação</th>
+                <th>Quantidade</th>
+                <th>Total</th>
+            </tr>
 
-        {% for item in request.session.cart %}
-        <tr>
-            <td class="d-none d-lg-block">
-                <img class="cart-img" src="{{ item.imagem }}">
-            </td>
-            <td>
-                <a href="#">
-                    {{ item.produto_nome }}
-                </a>
+            {# iterando pelos itens do carrinho #}
+            {% for item in request.session.cart.values %}
+            <tr>
+                {# imagem #}
+                <td class="d-none d-lg-block">
+                    <img class="cart-img" src="{{ item.imagem }}">
+                </td>
 
-                <a class="ml-3" href="#">
-                    <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
-                </a>
-            </td>
-            <td>{{ item.variacao_nome }}</td>
-            <td>
-                {{ item.quantidade }} x
-                {% if item.preco_unitario_promocional %}
-                {{ item.preco_unitario_promocional }}
+                {# nome do produto #}
+                <td>
+                    {# nome do produto #}
+                    <a href="{% url 'produto:detail' item.slug %}">
+                        {{ item.produto_nome }}
+                    </a>
+                    {# ícone remover #}
+                    <a class="ml-3" href="#">
+                        <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
+                    </a>
+                </td>
+
+                {# nome da variação #}
+                <td>{{ item.variacao_nome }}</td>
+
+                {# quantidade #}
+                <td>
+                    {{ item.qtd }} x
+
+                    {# se existir preço promocional, considera-o #}
+                    {% if item.preco_unitario_promocional %}
+                        {{ item.preco_unitario_promocional }}
+
+                    {# senão, considera o preço #}
+                    {% else %}                
+                        {{ item.preco_unitario }}
+                    {% endif %}
+                </td>
+
+                {# total #}
+                {# se existir preço total promocional, considera-o #}
+                {% if item.preco_total_promocional %}
+                    <td>{{ item.preco_total_promocional }}</td>
+
+                {# senão, considera o preço total #}
                 {% else %}
-                {{ item.preco_unitario }}
+                    <td>{{ item.preco_total }}</td>
                 {% endif %}
-            </td>
 
-            {% if item.preco_quantitativo_promocional %}
-            <td>{{ item.preco_quantitativo_promocional }}</td>
-            {% else %}
-            <td>{{ item.preco_quantitativo }}</td>
-            {% endif %}
+            </tr>
+            {% endfor %}
 
-        </tr>
-        {% endfor %}
+        </table>
+    </div>
 
-
-    </table>
-</div>
-
+{# senão #}
 {% else %}
 
-Carrinho vazio...
+    {# renderiza mensagem de carrinho vazio #}
+    <div class="row mt-3">
+        <div class="col">
+            <h3>Carrinho vazio</h3>
+            <p class="lead">Não há produtos no seu carrinho.</p>
+        </div>
+    </div>
 
 {% endif %}
 

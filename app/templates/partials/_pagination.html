@@ -1,40 +1,40 @@
-<!-- arquivo parcial com a paginação -->
+{# arquivo parcial com a paginação #}
 
-<!-- se a variável is_paginated estiver setada -->
+{# se a variável is_paginated estiver setada #}
 {% if is_paginated %}
 <div class="pagination">
     <ul class="pagination">
         
-        <!-- se existirem páginas anteriores à atual -->
+        {# se existirem páginas anteriores à atual #}
         {% if page_obj.has_previous %}
 
-            <!-- desenha o botão de navegação para a primeira página (<<) -->
+            {# desenha o botão de navegação para a primeira página (<<) #}
             <li class="page-item">
                 <a class="page-link" href="?page=1">&laquo;</a>
             </li>
 
-            <!-- desenha o botão de navegação para a página anterior (<) -->
+            {# desenha o botão de navegação para a página anterior (<) #}
             <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
             </li>
 
         {% endif %}
 
-        <!-- iterando sobre o número total de páginas -->
+        {# iterando sobre o número total de páginas #}
         {% for num in page_obj.paginator.page_range %}
 
-            <!-- se for a página atual -->
+            {# se for a página atual #}
             {% if page_obj.number == num %}
 
-                <!-- desenha o botão da página atual com estilização diferenciada -->
+                {# desenha o botão da página atual com estilização diferenciada #}
                 <li class="page-item active">
                     <a class="page-link" href="?page={{ num }}">{{ num }}</a>
                 </li>
 
-            <!-- se não for a página atual, mas estiver a 3 posições da página atual -->
+            {# se não for a página atual, mas estiver a 3 posições da página atual #}
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                 
-                <!-- desenha o botão da referida página -->
+                {# desenha o botão da referida página #}
                 <li class="page-item">
                     <a class="page-link" href="?page={{ num }}">{{ num }}</a>
                 </li>
@@ -43,15 +43,15 @@
 
         {% endfor %}
 
-        <!-- se existirem páginas posteriores à atual -->
+        {# se existirem páginas posteriores à atual #}
         {% if page_obj.has_next %}
 
-            <!-- desenha o botão de navegação para a página posterior (>) -->
+            {# desenha o botão de navegação para a página posterior (>) #}
             <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
             </li>
 
-            <!-- desenha o botão de navegação para a última página (>>) -->
+            {# desenha o botão de navegação para a última página (>>) #}
             <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
             </li>

@@ -41,6 +41,9 @@
     preco_promocional_float = preco_promocional.replace("R$ ", "").replace(",",".");
     preco_promocional_float = Number.parseFloat(preco_promocional_float);
 
+    console.log(preco_float)
+    console.log(preco_promocional_float)
+
     
 
     // se o preço for maior que o preço promocional

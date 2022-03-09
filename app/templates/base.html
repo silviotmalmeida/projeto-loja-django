@@ -1,28 +1,28 @@
-<!-- arquivo de template global do sistema -->
+{# arquivo de template global do sistema #}
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- carregando o head definido em partials/_head.html -->
+    {# carregando o head definido em partials/_head.html #}
     {% include 'partials/_head.html' %}
 
-    <!-- carregando o título definido nos templates -->
+    {# carregando o título definido nos templates #}
     <title>Loja: {% block title %}{% endblock %}</title>
   </head>
 
   <body>
-    <!-- carregando o menu definido em partials/_nav.html -->
+    {# carregando o menu definido em partials/_nav.html #}
     {% include 'partials/_nav.html' %}
 
     <main class="container mt-4 mb-4">
-      <!-- carregando as mensagens definidas em partials/_messages.html -->
+      {# carregando as mensagens definidas em partials/_messages.html #}
       {% include 'partials/_messages.html' %}
 
-      <!-- carregando o conteudo definido nos templates -->
+      {# carregando o conteudo definido nos templates #}
       {% block content %}{% endblock %}
     </main>
 
-    <!-- carregando o footer definido em partials/_footer.html -->
+    {# carregando o footer definido em partials/_footer.html #}
     {% include 'partials/_footer.html' %}
   </body>
 </html>

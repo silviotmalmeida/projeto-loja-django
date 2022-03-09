@@ -36,12 +36,13 @@ class Produto(models.Model):
     slug = models.SlugField(unique=True, blank=True,
                             null=True, verbose_name='Slug')
 
-    # criando o atributo preco_marketing como float, com valor default 0
-    preco_marketing = models.FloatField(default=0, verbose_name='Preço (R$)')
+    # criando o atributo preco_marketing como float
+    preco_marketing = models.FloatField(
+        blank=True, null=True, verbose_name='Preço (R$)')
 
     # criando o atributo preco_marketing_promocional como float, com valor default 0
     preco_marketing_promocional = models.FloatField(
-        default=0, verbose_name='Preço Promocional (R$)')
+        blank=True, null=True, verbose_name='Preço Promocional (R$)')
 
     # criando o atributo tipo com opções pré-definidas
     tipo = models.CharField(default='S',
@@ -76,15 +77,10 @@ class Produto(models.Model):
     # sobrescrevendo o método do django de salvar no BD
     def save(self, *args, **kwargs):
 
-        # se o preco_marketing_promocional não foi informado
-        if not self.preco_marketing_promocional:
-            # atribui o mesmo valor do preco_marketing
-            self.preco_marketing_promocional = self.preco_marketing
-
         # se o preco_marketing_promocional for maior que o preco_marketing
-        if self.preco_marketing_promocional > self.preco_marketing:
-            # atribui o mesmo valor do preco_marketing
-            self.preco_marketing_promocional = self.preco_marketing
+        if self.preco_marketing_promocional and self.preco_marketing_promocional > self.preco_marketing:
+            # remove o preco_marketing_promocional
+            self.preco_marketing_promocional = None
 
         # se o slug não foi informado
         if not self.slug:
@@ -144,7 +140,7 @@ class Variacao(models.Model):
 
     # criando o atributo preco_promocional como float, com valor default 0
     preco_promocional = models.FloatField(
-        default=0, verbose_name='Preço Promocional (R$)')
+        blank=True, null=True, verbose_name='Preço Promocional (R$)')
 
     # criando o atributo estoque como inteiro positivo
     estoque = models.PositiveIntegerField(default=0, verbose_name='Estoque')
@@ -169,15 +165,10 @@ class Variacao(models.Model):
             # atribui o mesmo nome do produto
             self.nome = self.id_produto.nome
 
-        # se o preco_promocional não foi informado
-        if not self.preco_promocional:
-            # atribui o mesmo valor do preco
-            self.preco_promocional = self.preco
-
         # se o preco_promocional for maior que o preco
-        if self.preco_promocional > self.preco:
-            # atribui o mesmo valor do preco_marketing
-            self.preco_promocional = self.preco
+        if self.preco_promocional and self.preco_promocional > self.preco:
+            # remove o preco_promocional
+            self.preco_promocional = None
 
         # utilizando as definições da superclasse para salvar no BD
         super().save(*args, **kwargs)
@@ -216,8 +207,8 @@ class Variacao(models.Model):
             # iterando no array de variações
             for variacao in variacoes:
 
-                # se o preço promocional da variação for menor que o menor preço
-                if(variacao.preco_promocional < lower_price_promotional):
+                # se o preço da variação for menor que o menor preço
+                if(variacao.preco < lower_price):
                     # atualiza as variáveis de menor preço
                     lower_price = variacao.preco
                     lower_price_promotional = variacao.preco_promocional
@@ -231,9 +222,9 @@ class Variacao(models.Model):
             # altera o tipo do produto para simples
             produto.tipo = 'S'
 
-            # atribui os preços zerados ao produto
-            produto.preco_marketing = 0.00
-            produto.preco_marketing_promocional = 0.00
+            # atribui os preços vazios ao produto
+            produto.preco_marketing = None
+            produto.preco_marketing_promocional = None
 
         # salva no BD
         produto.save()

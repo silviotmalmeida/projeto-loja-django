@@ -1,20 +1,20 @@
-<!-- extende o arquivo do template global base.html -->
+{# extende o arquivo do template global base.html #}
 {% extends 'base.html' %}
 
-<!-- carregando o módulo de filtros personalizados -->
+{# carregando o módulo de filtros personalizados #}
 {% load customizedFilters %}
 
-<!-- definindo o title a ser inserido no base.html -->
+{# definindo o title a ser inserido no base.html #}
 {% block title %}Detalhe do Produto{% endblock %}
 
-<!-- criando o bloco content a ser inserido no base.html -->
+{# criando o bloco content a ser inserido no base.html #}
 {% block content %}
 
 <div class="row">
 
-    <!-- inserindo a imagem -->
-    <!-- se existir imagem cadastrada, adiciona no template -->
-    <!-- senão utiliza a imagem default -->
+    {# inserindo a imagem #}
+    {# se existir imagem cadastrada, adiciona no template #}
+    {# senão utiliza a imagem default #}
     <div class="col-lg">
         <div class="row no-gutters">
             <div class="col-lg-12">
@@ -23,17 +23,17 @@
         </div>
     </div>
 
-    <!-- inserindo os dados do produto -->
+    {# inserindo os dados do produto #}
     <div class="col-lg">
         <div class="mt-4 mt-lg-0">
             <h1 class="h2">{{ produto.nome }}</h1>
             <p class="lead">{{ produto.descricao_curta }}</p>
             <p class="lead">
 
-            <!-- inserindo o span do preço -->
+            {# inserindo o span do preço #}
             <span id="variation-preco-promocional" class="lead product-price"></span>
             
-            <!-- inserindo o span do preço tachado -->
+            {# inserindo o span do preço tachado #}
             <span id="variation-preco" class="lead product-old-price text-muted"></span>
 
             </p>
@@ -42,19 +42,19 @@
                 <div class="form-group">
 
 
-                    <!-- inserindo as variações do produto -->
+                    {# inserindo as variações do produto #}
                     <select id="select-variacoes" name="vid" class="form-control form-control-lg">
                             
-                            <!-- inserindo a opção default -->
+                            {# inserindo a opção default #}
                             <option data-preco=""
                                 data-preco-promocional=""
                                 value="" selected="selected">{% if produto.tipo == 'S' %}Produto indisponível{% else %}Selecione um produto{% endif %}
                             </option>
                         
-                        <!-- iterando sobre o array de variações -->
+                        {# iterando sobre o array de variações #}
                         {% for variacao in produto.variacao_set.all %}
                         
-                            <!-- inserindo as variações -->
+                            {# inserindo as variações #}
                             <option data-preco="{{ variacao.preco|currency_format }}"
                                 data-preco-promocional="{{ variacao.preco_promocional|currency_format }}"
                                 value="{{ variacao.id }}">{{ variacao.nome }}
