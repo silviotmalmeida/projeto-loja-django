@@ -17,3 +17,10 @@ def currency_format(value):
     except:
         # retorna o valor original
         return value
+
+
+# função reponsável por somar a quantidade de itens no carrinho
+def sum_items(cart):
+
+    # somando a quantidade de itens
+    return sum([item['qtd'] for item in cart.values()])

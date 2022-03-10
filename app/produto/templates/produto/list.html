@@ -38,7 +38,7 @@
           <div class="container product-price-block text-center">
 
             {# se existir variação, exibe o termo "A partir de: "  #}
-            {% if produto.tipo == 'V' %}
+            {% if produto.disponivel == True %}
               <span class="product-text-price">A partir de: </span> 
             
               {# se existir promoção, exibe o preço cortado e o preço promocional destacado  #}

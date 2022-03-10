@@ -1,5 +1,8 @@
 {# arquivo parcial com o menu do template global do sistema #}
 
+{# carregando o módulo de filtros personalizados #}
+{% load customizedFilters %}
+
 <nav class="navbar navbar-dark bg-primary navbar-expand-lg">
   <a class="navbar-brand" href="{% url 'produto:list' %}">Loja</a>
   <button
@@ -46,17 +49,29 @@
       <li class="nav-item">
         <a class="nav-link disabled" href="#">Disabled</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link nav-cart-link active" href="{% url 'produto:showcart' %}">
-          <span class="nav-cart-text mr-1"> Carrinho </span>
-          <span class="nav-cart-count mr-1">
-            <strong>109x</strong>
-          </span>
-          <span class="nav-cart-icon mr-2">
-            <i class="fas fa-shopping-cart"></i>
-          </span>
-        </a>
-      </li>
+
+      {# se o carrinho da sessão existir #}
+      {% if request.session.cart %}
+        {# renderizando o link para o carrinho #}
+        <li class="nav-item">
+          <a class="nav-link nav-cart-link active" href="{% url 'produto:showcart' %}">
+            
+            {# tag carrinho #}
+            <span class="nav-cart-text mr-1"> Carrinho </span>
+
+            {# quantidade de itens no carrinho #}
+            <span class="nav-cart-count mr-1">
+              <strong>({{ request.session.cart|sum_items}})</strong>
+            </span>
+
+            {# ícone do carrinho #}
+            <span class="nav-cart-icon mr-2">
+              <i class="fas fa-shopping-cart"></i>
+            </span>
+          </a>
+        </li>
+      {% endif %}
+      
     </ul>
     <form class="form-inline my-2 my-lg-0">
       <input

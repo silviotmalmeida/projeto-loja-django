@@ -19,7 +19,7 @@ class ProdutoAdmin(admin.ModelAdmin):
 
     # definindo as colunas a serem exibidas
     list_display = ('id', 'nome', 'descricao_curta', 'formatted_preco_marketing',
-                    'formatted_preco_marketing_promocional', 'tipo')
+                    'formatted_preco_marketing_promocional', 'disponivel')
 
     # definindo em quais colunas serão colocados links de edição
     list_display_links = ('id', 'nome')

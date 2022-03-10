@@ -36,22 +36,17 @@ class Produto(models.Model):
     slug = models.SlugField(unique=True, blank=True,
                             null=True, verbose_name='Slug')
 
-    # criando o atributo preco_marketing como float
+    # criando o atributo preco_marketing como float, não editável
     preco_marketing = models.FloatField(
-        blank=True, null=True, verbose_name='Preço (R$)')
+        blank=True, null=True, editable=False, verbose_name='Preço (R$)')
 
-    # criando o atributo preco_marketing_promocional como float, com valor default 0
+    # criando o atributo preco_marketing_promocional como float, não editável
     preco_marketing_promocional = models.FloatField(
-        blank=True, null=True, verbose_name='Preço Promocional (R$)')
+        blank=True, null=True, editable=False, verbose_name='Preço Promocional (R$)')
 
-    # criando o atributo tipo com opções pré-definidas
-    tipo = models.CharField(default='S',
-                            max_length=1,
-                            choices=(
-                                ('V', 'Variável'),
-                                ('S', 'Simples'),
-                            ),
-                            verbose_name='Tipo')
+    # criando o atributo disponivel como booleano, com default False, não editável
+    disponivel = models.BooleanField(
+        default=False, editable=False, verbose_name='Disponível?')
 
     # definindo qual atributo da model será exibido na área administrativa
     def __str__(self):
@@ -76,11 +71,6 @@ class Produto(models.Model):
 
     # sobrescrevendo o método do django de salvar no BD
     def save(self, *args, **kwargs):
-
-        # se o preco_marketing_promocional for maior que o preco_marketing
-        if self.preco_marketing_promocional and self.preco_marketing_promocional > self.preco_marketing:
-            # remove o preco_marketing_promocional
-            self.preco_marketing_promocional = None
 
         # se o slug não foi informado
         if not self.slug:
@@ -131,9 +121,8 @@ class Variacao(models.Model):
     id_produto = models.ForeignKey(
         Produto, on_delete=models.CASCADE, verbose_name='Produto')
 
-    # criando o atributo nome como texto, opcional, com tamanho máximo de 50
-    nome = models.CharField(max_length=50, blank=True,
-                            null=True, verbose_name='Nome')
+    # criando o atributo nome como texto, com tamanho máximo de 50
+    nome = models.CharField(max_length=50, verbose_name='Nome')
 
     # criando o atributo preco como float, com valor default 0
     preco = models.FloatField(default=0, verbose_name='Preço (R$)')
@@ -197,8 +186,8 @@ class Variacao(models.Model):
         # se existirem variações
         if (variacoes):
 
-            # altera o tipo do produto para variável
-            produto.tipo = 'V'
+            # define o produto como disponível
+            produto.disponivel = True
 
             # inicializando as variáveis de menor preço
             lower_price = 1000000.00
@@ -219,8 +208,8 @@ class Variacao(models.Model):
 
         # senão
         else:
-            # altera o tipo do produto para simples
-            produto.tipo = 'S'
+            # define o produto como indisponível
+            produto.disponivel = False
 
             # atribui os preços vazios ao produto
             produto.preco_marketing = None

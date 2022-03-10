@@ -53,7 +53,7 @@ class AddCart(View):
     # definindo a resposta a uma requisição get
     def get(self, *args, **kwargs):
 
-        # não será permitida a edição da variação diretamente pela url
+        # não será permitida a adição da variação diretamente pela url
         # logo tem como premissa que a resuisição se originará a partir de uma página
         # obtendo a url da página que originou a requisição
         if 'HTTP_REFERER' in self.request.META:
@@ -63,7 +63,7 @@ class AddCart(View):
         # senão
         else:
             # envia mensagem de erro
-            messages.error(self.request, 'Produto inválido!')
+            messages.error(self.request, 'Página inválida!')
             # redireciona para a página inicial
             return redirect('produto:list')
 
@@ -86,7 +86,7 @@ class AddCart(View):
         produto = variacao.id_produto
 
         # obtendo a url da imagem do produto
-        image = '/media/default.png' if not produto.imagem else produto.imagem.name
+        image = '/default.png' if not produto.imagem else produto.imagem.name
 
         if variacao.estoque < 1:
             # envia mensagem de erro
@@ -160,7 +160,52 @@ class AddCart(View):
 
 # definindo a view RemoveCart
 class RemoveCart(View):
-    pass
+    # definindo a resposta a uma requisição get
+    def get(self, *args, **kwargs):
+
+        # não será permitida a remoção da variação diretamente pela url
+        # logo tem como premissa que a resuisição se originará a partir de uma página
+        # obtendo a url da página que originou a requisição
+        if 'HTTP_REFERER' in self.request.META:
+            # se existir, popula a variável
+            origin_url = self.request.META['HTTP_REFERER']
+
+        # senão
+        else:
+            # envia mensagem de erro
+            messages.error(self.request, 'Página inválida!')
+            # redireciona para a página inicial
+            return redirect('produto:list')
+
+        # obtendo o id da variação selecionada a partir da url
+        variacao_id = self.request.GET.get('vid')
+
+        # se o id da variação não estiver na requisição
+        if not variacao_id:            
+            # redireciona para a página que originou a requisição
+            return redirect(origin_url)
+
+        # se o carrinho da sessão não existir
+        if not self.request.session.get('cart'):         
+            # redireciona para a página que originou a requisição
+            return redirect(origin_url)
+
+        # se o id da variação não estiver no carrinho da sessão
+        if variacao_id not in self.request.session.get('cart'):            
+            # redireciona para a página que originou a requisição
+            return redirect(origin_url)
+
+        # removendo o registro da variação no carrinho da sessão
+        del(self.request.session['cart'][variacao_id])
+
+        # salvando o status da sessão
+        self.request.session.save()
+
+        # envia mensagem de sucesso
+        messages.success(self.request, 'Produto removido do carrinho.')
+
+        # redireciona para a página que originou a requisição
+        return redirect(origin_url)
 
 
 # definindo a view ShowCart
@@ -205,15 +250,6 @@ class LoadTestData(View):
             # criando as variações
             for x in range(qtd_variacoes):
 
-                # se só existir uma variação
-                if qtd_variacoes == 1:
-                    # assumirá o nome do produto
-                    nome = produto.nome
-                # senão
-                else:
-                    # terá o número da variação
-                    nome = f'Variacao {x+1} {produto.nome}'
-
                 # sorteando se existirá promoção
                 if random.randint(0, 1):
                     preco_promocional=round(random.uniform(10, 500), 2)
@@ -223,7 +259,7 @@ class LoadTestData(View):
                 # cadastrando a nova variação
                 variacao = Variacao.objects.create(
                     id_produto=produto,
-                    nome=nome,
+                    nome=f'Variacao {x+1} {produto.nome}',
                     preco=round(random.uniform(10, 500), 2),
                     preco_promocional=preco_promocional,
                     estoque=random.randint(0, 100),)

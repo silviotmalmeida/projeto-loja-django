@@ -18,3 +18,13 @@ register = Library()
 def currency_format(value):
 
     return utils.currency_format(value)
+
+
+# criando o filtro reponsável por sumar a quantidade de itens no carrinho
+# decorando a função como um filtro chamado sum_items
+@register.filter(name='sum_items')
+# criando a função
+# o argumento a ser recebido é o texto antes do pipe
+def sum_items(value):
+
+    return utils.sum_items(value)
