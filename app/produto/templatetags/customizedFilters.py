@@ -20,7 +20,7 @@ def currency_format(value):
     return utils.currency_format(value)
 
 
-# criando o filtro reponsável por sumar a quantidade de itens no carrinho
+# criando o filtro reponsável por somar a quantidade de itens no carrinho
 # decorando a função como um filtro chamado sum_items
 @register.filter(name='sum_items')
 # criando a função
@@ -28,3 +28,13 @@ def currency_format(value):
 def sum_items(value):
 
     return utils.sum_items(value)
+
+
+# criando o filtro reponsável por somar o preço de itens no carrinho
+# decorando a função como um filtro chamado sum_prices
+@register.filter(name='sum_prices')
+# criando a função
+# o argumento a ser recebido é o texto antes do pipe
+def sum_prices(value):
+
+    return utils.sum_prices(value)

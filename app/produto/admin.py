@@ -9,7 +9,7 @@ class VariacaoInline(admin.TabularInline):
     # model a ser utilizado
     model = Variacao
     # quantidade de variações em branco a serem exibidas
-    extra = 0
+    extra = 1
 
 # definindo as configurações de exibição do Produto na área administrativa
 class ProdutoAdmin(admin.ModelAdmin):

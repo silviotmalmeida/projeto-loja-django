@@ -22,7 +22,7 @@ urlpatterns = [
     # definindo o endpoint de exibir o carrinho
     path('showcart/', views.ShowCart.as_view(), name='showcart'),
     # definindo o endpoint de finalizar a compra
-    path('finalize/', views.Finalize.as_view(), name='finalize'),
+    path('summary/', views.Summary.as_view(), name='summary'),
 
     # definindo a url para carregamento de dados de teste
     path('loadtestdata/', views.LoadTestData.as_view(), name='loadtestdata'),

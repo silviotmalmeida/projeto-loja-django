@@ -13,7 +13,7 @@ urlpatterns = [
     # definindo o endpoint de pagamento de pedidos
     path('', views.Pay.as_view(), name='pay'),
     # definindo o endpoint de fechamento de pedidos
-    path('close/', views.Close.as_view(), name='close'),
+    path('save/', views.Save.as_view(), name='save'),
     # definindo o endpoint de detalhe de pedidos
     path('detail/', views.Detail.as_view(), name='login'),
 ]

@@ -217,8 +217,8 @@ class ShowCart(View):
         return render(self.request, 'produto/cart.html')
 
 
-# definindo a view Finalize
-class Finalize(View):
+# definindo a view Summary
+class Summary(View):
     pass
 
 

@@ -124,10 +124,10 @@ class Variacao(models.Model):
     # criando o atributo nome como texto, com tamanho máximo de 50
     nome = models.CharField(max_length=50, verbose_name='Nome')
 
-    # criando o atributo preco como float, com valor default 0
-    preco = models.FloatField(default=0, verbose_name='Preço (R$)')
+    # criando o atributo preco como float
+    preco = models.FloatField(verbose_name='Preço (R$)')
 
-    # criando o atributo preco_promocional como float, com valor default 0
+    # criando o atributo preco_promocional como float, opcional
     preco_promocional = models.FloatField(
         blank=True, null=True, verbose_name='Preço Promocional (R$)')
 
@@ -203,8 +203,10 @@ class Variacao(models.Model):
                     lower_price_promotional = variacao.preco_promocional
 
             # atribui os preços ajustados ao produto
-            produto.preco_marketing = lower_price
-            produto.preco_marketing_promocional = lower_price_promotional
+            if lower_price != 1000000.00:
+                produto.preco_marketing = lower_price
+            if lower_price_promotional != 1000000.00:
+                produto.preco_marketing_promocional = lower_price_promotional
 
         # senão
         else:

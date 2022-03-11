@@ -50,8 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-
+    'crispy_forms',
 
     # FIXME: manter somente em ambiente de desenvolvimento
     'debug_toolbar',
@@ -65,8 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-
+    
     # FIXME: manter somente em ambiente de desenvolvimento
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]

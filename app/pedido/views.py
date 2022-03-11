@@ -11,8 +11,8 @@ class Pay(View):
     pass
 
 
-# definindo a view Close
-class Close(View):
+# definindo a view Save
+class Save(View):
     pass
 
 
