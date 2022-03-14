@@ -38,40 +38,49 @@
 
             </p>
 
-            <form action="{% url 'produto:addcart' %}" id="form-add-to-cart">
-                <div class="form-group">
+            {# se existir variação, exibe o select #}
+            {% if produto.disponivel == True %}
+
+                <form action="{% url 'produto:addcart' %}" id="form-add-to-cart">
+                    <div class="form-group">
 
 
-                    {# inserindo as variações do produto #}
-                    <select id="select-variacoes" name="vid" class="form-control form-control-lg">
+                        {# inserindo as variações do produto #}
+                        <select id="select-variacoes" name="vid" class="form-control form-control-lg">
+                                
+                                {# inserindo a opção default #}
+                                <option data-preco=""
+                                    data-preco-promocional=""
+                                    value="" selected="selected">{% if produto.tipo == 'S' %}Produto indisponível{% else %}Selecione um produto{% endif %}
+                                </option>
                             
-                            {# inserindo a opção default #}
-                            <option data-preco=""
-                                data-preco-promocional=""
-                                value="" selected="selected">{% if produto.tipo == 'S' %}Produto indisponível{% else %}Selecione um produto{% endif %}
-                            </option>
-                        
-                        {# iterando sobre o array de variações #}
-                        {% for variacao in produto.variacao_set.all %}
-                        
-                            {# inserindo as variações #}
-                            <option data-preco="{{ variacao.preco|currency_format }}"
-                                data-preco-promocional="{{ variacao.preco_promocional|currency_format }}"
-                                value="{{ variacao.id }}">{{ variacao.nome }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
+                            {# iterando sobre o array de variações #}
+                            {% for variacao in produto.variacao_set.all %}
+                            
+                                {# inserindo as variações #}
+                                <option data-preco="{{ variacao.preco|currency_format }}"
+                                    data-preco-promocional="{{ variacao.preco_promocional|currency_format }}"
+                                    value="{{ variacao.id }}">{{ variacao.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <div class="text-left">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
-                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                        Adicionar ao carrinho
-                    </button>
-                </div>
+                    <div class="text-left">
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">
+                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                            Adicionar ao carrinho
+                        </button>
+                    </div>
 
-            </form>
+                </form>
+            
+                {# exibe mensagem de produto indisponível #}
+                {% else %}
 
+                    <p class="lead text-danger">Produto indisponível</p>
+
+                {% endif %}
 
         </div>
     </div>

@@ -155,6 +155,9 @@ MESSAGE_TAGS = {
     constants.INFO: 'alert-info',
 }
 
+# redefinindo o template a ser utilizado pelo crispy forms
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 # definindo as regras da sessão
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # duração da sessão
 # regra para salvar automaticamente a sessão a cada requisição
