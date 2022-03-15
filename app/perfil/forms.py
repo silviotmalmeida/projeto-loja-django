@@ -7,12 +7,16 @@ from django.contrib.auth.models import User
 # importando as models de perfil
 from . import models
 
-# importando a biblioteca de expressões regulares
-import re
-
 
 # formulário responsável pelo cadastro do perfil de um usuário
 class PerfilForm(forms.ModelForm):
+
+    # customizando o método construtor da classe, adicionando o atributo perfil
+    def __init__(self, perfil=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # atribuindo o user
+        self.perfil = perfil
 
     # customizando o formulário
     class Meta:
@@ -27,14 +31,15 @@ class PerfilForm(forms.ModelForm):
 # formulário responsável pelo cadastro de um usuário django
 class UserForm(forms.ModelForm):
 
-    # adicionando o campo password ao formulário
+    # adicionando o campo password ao formulário, em branco
+    # para evitar que a senha do bd seja exposta
     password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
         label='Senha',
     )
 
-    # adicionando o campo password2 ao formulário
+    # adicionando o campo password2 ao formulário, para confirmação de senha
     password2 = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
@@ -81,9 +86,10 @@ class UserForm(forms.ModelForm):
         email_db = User.objects.filter(email=email_data).first()
 
         # definindo os textos dos erros de validação
-        error_msg_username_exists = 'Usuário já existe'
+        error_msg_username_exists = 'Nome de usuário já existe'
+        error_msg_username_match = 'Nome de usuário não pode ser alterado'
         error_msg_email_exists = 'E-mail já existe'
-        error_msg_email_invalid = 'Informe um endereço de email válido'
+        error_msg_email_empty = 'E-mail não pode ser vazio'
         error_msg_password_match = 'As duas senhas não conferem'
         error_msg_password_short = 'Sua senha precisa de pelo menos 6 caracteres'
         error_msg_required_field = 'Este campo é obrigatório.'
@@ -95,14 +101,17 @@ class UserForm(forms.ModelForm):
                 # se o username do formulário for diferente do cadastrado no bd
                 if username_data != username_db.username:
                     # adiciona um erro de validação
-                    validation_error_msgs['username'] = error_msg_username_exists
+                    validation_error_msgs['username'] = error_msg_username_match
+
+            # se email não foi preenchido
+            if not email_data:
+                # adiciona um erro de validação
+                validation_error_msgs['email'] = error_msg_email_empty
 
             # se o email já estiver sendo utilizado
             if email_db:
-                # se o email do formulário for diferente do cadastrado no bd
-                if email_data != email_db.email:
-                    # adiciona um erro de validação
-                    validation_error_msgs['email'] = error_msg_email_exists
+                # adiciona um erro de validação
+                validation_error_msgs['email'] = error_msg_email_exists
 
             # se password foi preenchido
             if password_data:
@@ -124,14 +133,15 @@ class UserForm(forms.ModelForm):
                 # adiciona um erro de validação
                 validation_error_msgs['username'] = error_msg_username_exists
 
+            # se email não foi preenchido
+            if not email_data:
+                # adiciona um erro de validação
+                validation_error_msgs['email'] = error_msg_email_empty
+
             # se o email já estiver sendo utilizado
             if email_db:
                 # adiciona um erro de validação
                 validation_error_msgs['email'] = error_msg_email_exists
-
-            if len(email_data) < 1:
-                # adiciona um erro de validação
-                validation_error_msgs['email'] = error_msg_email_invalid
 
             # se password não foi preenchido
             if not password_data:

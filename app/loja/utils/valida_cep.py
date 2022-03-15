@@ -7,7 +7,7 @@ def valida_cep(cep):
 
     # validando a entrada
     # se o tamanho for diferente de 5
-    if len(cep) != 5:
+    if len(cep) != 8:
         return False
 
     # se não for número
