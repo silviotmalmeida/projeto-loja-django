@@ -8,16 +8,16 @@ from .models import Perfil
 class PerfilAdmin(admin.ModelAdmin):
 
     # definindo as colunas a serem exibidas
-    list_display = ('id', 'id_usuario', 'cpf',)
+    list_display = ('id_usuario', 'cpf',)
 
     # definindo em quais colunas serão colocados links de edição
-    list_display_links = ('id',)
+    list_display_links = ('id_usuario',)
 
     # definindo o limite de registros por página
     list_per_page = 10
 
     # definindo as colunas a serem consideradas no campo de pesquisa
-    search_fields = ('id', 'cpf')
+    search_fields = ('cpf',)
 
     # definindo as colunas liberadas para ediçao na tela de listagem
     list_editable = ()

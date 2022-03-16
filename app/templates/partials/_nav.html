@@ -5,6 +5,8 @@
 
 <nav class="navbar navbar-dark bg-primary navbar-expand-lg">
   <a class="navbar-brand" href="{% url 'produto:list' %}">Loja</a>
+
+  {# renderizando o toggler #}
   <button
     class="navbar-toggler"
     type="button"
@@ -17,17 +19,13 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
+  {# itens a serem inseridos no toggler #}
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav ml-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="{% url 'perfil:create' %}"
-          >Login</a
-        >
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
-      </li>
-      <li class="nav-item dropdown">
+      
+      {# renderizando o menu do usuário #}
+      {% if request.user.is_authenticated %}
+      <li class="nav-item active dropdown">
         <a
           class="nav-link dropdown-toggle"
           href="#"
@@ -37,18 +35,22 @@
           aria-haspopup="true"
           aria-expanded="false"
         >
-          Dropdown
+          Meu Menu
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
+          <a class="dropdown-item" href="#">Meus Pedidos</a>
+          <a class="dropdown-item" href="{% url 'perfil:create' %}">Atualizar perfil</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Something else here</a>
+          <a class="dropdown-item" href="{% url 'perfil:logout' %}">Sair</a>
         </div>
       </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
+      {# renderizando botão de login #}
+      {% else %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'perfil:login' %}">Entre / Cadastre-se</a>
       </li>
+      {% endif %}
+
 
       {# se o carrinho da sessão existir #}
       {% if request.session.cart %}
@@ -73,6 +75,8 @@
       {% endif %}
       
     </ul>
+
+    {# formulário de busca #}
     <form class="form-inline my-2 my-lg-0">
       <input
         class="form-control mr-sm-2"

@@ -10,10 +10,8 @@ app_name = 'perfil'
 
 # definindo os endpoints do app
 urlpatterns = [
-    # definindo o endpoint de criação de perfis
+    # definindo o endpoint de criação e atualização de perfis
     path('', views.Create.as_view(), name='create'),
-    # definindo o endpoint de edição de perfis
-    path('update/', views.Update.as_view(), name='update'),
     # definindo o endpoint de login
     path('login/', views.Login.as_view(), name='login'),
     # definindo o endpoint de logout

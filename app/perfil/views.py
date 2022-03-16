@@ -1,5 +1,5 @@
 # importação default
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 # importando os tipos de views a serem utilizadas
 from django.views.generic.list import ListView
@@ -8,11 +8,21 @@ from django.views import View
 # importando a model User do django
 from django.contrib.auth.models import User
 
+# importando as funções de autenticação do django
+from django.contrib.auth import authenticate, login
+
 # importando as models do app
 from . import models
 
 # importando os forms do app
 from . import forms
+
+# biblioteca para cópia de objetos
+import copy
+
+# importando as mensagens do django
+from django.contrib import messages
+
 
 
 # definindo a view BaseCustomView
@@ -25,11 +35,17 @@ class BaseCustomView(View):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
 
+        # criando uma cópia do carrinho da sessão
+        self.cart = copy.deepcopy(self.request.session.get('cart'), {})
+
         # inicializando o perfil
         self.perfil = None
 
         # se o usuário estiver autenticado
         if self.request.user.is_authenticated:
+
+            # altera o template a ser utilizado
+            self.template_name = 'perfil/update.html'
 
             # obtendo o perfil do usuário logado
             self.perfil = models.Perfil.objects.filter(
@@ -46,7 +62,6 @@ class BaseCustomView(View):
                 # passando o formulário de perfil, com dados do POST ou vazio
                 # e os dados do usuário logado
                 'perfilform': forms.PerfilForm(data=self.request.POST or None,
-                                               perfil=self.perfil,
                                                instance=self.perfil),
             }
         else:
@@ -78,6 +93,7 @@ class BaseCustomView(View):
 
 # definindo a view Create
 # vai herdar de BaseCustomView
+# possui a função de criar e editar usuários e perfis
 class Create(BaseCustomView):
 
     # definindo a resposta a uma requisição post
@@ -85,7 +101,11 @@ class Create(BaseCustomView):
 
         # se houve alguma falha de validação dos formulários
         if not self.userform.is_valid() or not self.perfilform.is_valid():
-            # renderizando o template
+
+            # envia mensagem de erro
+            messages.error(self.request, 'Foram encontrados erros no formulário.')
+
+            # renderizando o template mantendo os dados no POST
             return self.render_template
 
         # obtendo os dados do formulário
@@ -136,13 +156,28 @@ class Create(BaseCustomView):
             # salvando o perfil do user no bd
             perfil.save()
 
-        # renderizando o template
-        return self.render_template
+        # se o password foi preenchido
+        if password:
 
+            # verifica a validade dos dados de autenticação
+            is_user = authenticate(
+                self.request, username=self.request.user.username, password=password)
 
-# definindo a view Update
-class Update(ListView):
-    pass
+            # realiza o login
+            if is_user:
+                login(self.request, user=user)
+
+        # recriando o carrinho da sessão para evitar a perda do carrinho na edição do usuário
+        self.request.session['cart'] = self.cart
+
+        # salvando a sessão
+        self.request.session.save()
+
+        # enviando mensagem de sucesso  
+        messages.success(self.request, 'Operação realizada com sucesso!')
+
+        # reabre o template sem os dados no POST
+        return redirect('perfil:create')
 
 
 # definindo a view Login
