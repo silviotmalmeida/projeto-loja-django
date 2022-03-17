@@ -1,49 +1,72 @@
-{% load static %}
-{% load omfilters %}
+{# arquivo parcial com o carrinho da sessão #}
 
+{# carregando o suporte a arquivos estáticos #}
+{% load static %}
+
+{# carregando o módulo de filtros personalizados #}
+{% load customizedFilters %}
+
+{# renderizando a tabela com os itens do carrinho #}
 <div class="table-responsive">
     <table class="table">
+        {# cabeçalho da tabela #}
         <tr>
             <th class="d-none d-lg-block">Imagem</th>
             <th>Produto</th>
-            <th>V.</th>
-            <th>QTD.</th>
+            <th>Variação</th>
+            <th>Quantidade</th>
             <th>Total</th>
         </tr>
 
-        {% for linha in carrinho.values %}
+        {# iterando pelos itens do carrinho #}
+        {% for item in cart.values %}
         <tr>
+            {# imagem #}
             <td class="d-none d-lg-block">
-                <img class="cart-img" src="{% get_media_prefix %}{{ linha.imagem }}">
+                <img class="cart-img" src="{% get_media_prefix %}{{ item.imagem }}">
             </td>
-            <td>
-                <a href="{% url 'produto:detalhe' linha.slug %}">
-                    {{ linha.produto_nome }}
-                </a>
 
-                <a class="ml-3" href="{% url 'produto:removerdocarrinho' %}?vid={{ linha.variacao_id }}">
+            {# link do produto #}
+            <td>
+                {# nome do produto #}
+                <a href="{% url 'produto:detail' item.slug %}">
+                    {{ item.produto_nome }}
+                </a>
+                {# ícone remover #}
+                <a class="ml-3" href="{% url 'produto:removecart' %}?vid={{ item.variacao_id }}">
                     <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
                 </a>
             </td>
-            <td>{{ linha.variacao_nome }}</td>
+
+            {# nome da variação #}
+            <td>{{ item.variacao_nome }}</td>
+
+            {# quantidade #}
             <td>
-                {{ linha.quantidade }} x
-                {% if linha.preco_unitario_promocional %}
-                {{ linha.preco_unitario_promocional }}
-                {% else %}
-                {{ linha.preco_unitario }}
+                {{ item.qtd }} x
+
+                {# se existir preço promocional, considera-o #}
+                {% if item.preco_unitario_promocional %}
+                    {{ item.preco_unitario_promocional }}
+
+                {# senão, considera o preço #}
+                {% else %}                
+                    {{ item.preco_unitario }}
                 {% endif %}
             </td>
 
-            {% if linha.preco_quantitativo_promocional %}
-            <td>{{ linha.preco_quantitativo_promocional|formata_preco }}</td>
+            {# total #}
+            {# se existir preço total promocional, considera-o #}
+            {% if item.preco_total_promocional %}
+                <td>{{ item.preco_total_promocional }}</td>
+
+            {# senão, considera o preço total #}
             {% else %}
-            <td>{{ linha.preco_quantitativo|formata_preco }}</td>
+                <td>{{ item.preco_total }}</td>
             {% endif %}
 
         </tr>
         {% endfor %}
-
 
     </table>
 </div>

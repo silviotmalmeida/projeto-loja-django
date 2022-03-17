@@ -1,5 +1,8 @@
 # funções genéricas
 
+# importando a biblioteca de datas
+from datetime import date
+
 
 # função reponsável por formatar o preço como moeda
 def currency_format(value):
@@ -43,3 +46,20 @@ def sum_prices(cart):
             in cart.values()
         ]
     )
+
+
+# função que calcula a idade atual a partir da data de nascimento
+def age(birth_date):
+    # obtendo a data de hoje
+    today = date.today()
+
+    # calculando a diferença dos anos
+    age = today.year - birth_date.year
+
+    # se o mes atual e o dia atual são inferiores ao de nascimento
+    if today.month < birth_date.month and today.day < birth_date.day:
+        # decrementa a idade em 1
+        age -= 1
+
+    # retorna a idade calculada
+    return age

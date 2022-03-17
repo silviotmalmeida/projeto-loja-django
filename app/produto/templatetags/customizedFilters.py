@@ -38,3 +38,13 @@ def sum_items(value):
 def sum_prices(value):
 
     return utils.sum_prices(value)
+
+
+# criando o filtro reponsável por obter a idade do usuário
+# decorando a função como um filtro chamado age
+@register.filter(name='age')
+# criando a função
+# o argumento a ser recebido é o texto antes do pipe
+def age(value):
+
+    return utils.age(value)

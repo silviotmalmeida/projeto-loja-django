@@ -9,7 +9,7 @@ from django.views import View
 from django.contrib.auth.models import User
 
 # importando as funções de autenticação do django
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 # importando as models do app
 from . import models
@@ -22,7 +22,6 @@ import copy
 
 # importando as mensagens do django
 from django.contrib import messages
-
 
 
 # definindo a view BaseCustomView
@@ -103,7 +102,8 @@ class Create(BaseCustomView):
         if not self.userform.is_valid() or not self.perfilform.is_valid():
 
             # envia mensagem de erro
-            messages.error(self.request, 'Foram encontrados erros no formulário.')
+            messages.error(
+                self.request, 'Foram encontrados erros no formulário.')
 
             # renderizando o template mantendo os dados no POST
             return self.render_template
@@ -173,7 +173,7 @@ class Create(BaseCustomView):
         # salvando a sessão
         self.request.session.save()
 
-        # enviando mensagem de sucesso  
+        # enviando mensagem de sucesso
         messages.success(self.request, 'Operação realizada com sucesso!')
 
         # reabre o template sem os dados no POST
@@ -182,9 +182,69 @@ class Create(BaseCustomView):
 
 # definindo a view Login
 class Login(ListView):
-    pass
+    # definindo a resposta a uma requisição post
+    def post(self, *args, **kwargs):
+
+        # criando uma cópia do carrinho da sessão
+        cart = copy.deepcopy(self.request.session.get('cart'), {})
+
+        # obtendo os dados da requisição
+        username = self.request.POST.get('username')
+        password = self.request.POST.get('password')
+
+        # se o username ou password não foi preenchido
+        if not username or not password:
+
+            # enviando mensagem de erro
+            messages.error(self.request, 'Usuário ou senha inválidos')
+
+            # reabre o template sem os dados no POST
+            return redirect('perfil:create')
+
+        # verifica a validade dos dados de autenticação
+        user = authenticate(
+            self.request, username=username, password=password)
+
+        # em caso de erro de validação
+        if not user:
+            # enviando mensagem de erro
+            messages.error(self.request, 'Usuário ou senha inválidos')
+
+            # reabre o template sem os dados no POST
+            return redirect('perfil:create')
+
+        # realiza o login
+        login(self.request, user=user)
+
+        # recriando o carrinho da sessão para evitar a perda do carrinho no logout
+        self.request.session['cart'] = cart
+
+        # salvando a sessão
+        self.request.session.save()
+
+        # enviando mensagem de erro
+        messages.success(self.request, 'Login realizado com sucesso!')
+
+        # reabre o template sem os dados no POST
+        return redirect('produto:showcart')
 
 
 # definindo a view Logout
 class Logout(ListView):
-    pass
+    # definindo a resposta a uma requisição get
+    def get(self, *args, **kwargs):
+
+        # criando uma cópia do carrinho da sessão
+        cart = copy.deepcopy(self.request.session.get('cart'), {})
+
+        # efetuando o logout
+        logout(self.request)
+
+        # recriando o carrinho da sessão para evitar a perda do carrinho no logout
+        self.request.session['cart'] = cart
+
+        # salvando a sessão
+        self.request.session.save()
+
+        # reabre o template sem os dados no POST
+        return redirect('produto:list')

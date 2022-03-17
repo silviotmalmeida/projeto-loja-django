@@ -181,17 +181,17 @@ class RemoveCart(View):
         variacao_id = self.request.GET.get('vid')
 
         # se o id da variação não estiver na requisição
-        if not variacao_id:            
+        if not variacao_id:
             # redireciona para a página que originou a requisição
             return redirect(origin_url)
 
         # se o carrinho da sessão não existir
-        if not self.request.session.get('cart'):         
+        if not self.request.session.get('cart'):
             # redireciona para a página que originou a requisição
             return redirect(origin_url)
 
         # se o id da variação não estiver no carrinho da sessão
-        if variacao_id not in self.request.session.get('cart'):            
+        if variacao_id not in self.request.session.get('cart'):
             # redireciona para a página que originou a requisição
             return redirect(origin_url)
 
@@ -214,12 +214,40 @@ class ShowCart(View):
     # definindo a resposta a uma requisição get
     def get(self, *args, **kwargs):
 
-        return render(self.request, 'produto/cart.html')
+        # definindo o contexto a ser passado ao template
+        context = {
+
+            # obtendo o carrinho da sessão
+            'cart': self.request.session.get('cart', {})
+        }
+
+        # renderizando o template com o contexto
+        return render(self.request, 'produto/cart.html', context)
 
 
 # definindo a view Summary
 class Summary(View):
-    pass
+
+    # definindo a resposta a uma requisição get
+    def get(self, *args, **kwargs):
+
+        # se o usuário não estiver autenticado
+        if not self.request.user.is_authenticated:
+
+            # redireciona-o para a página de login
+            return redirect('perfil:create')
+
+        # definindo o contexto a ser passado ao template
+        context = {
+
+            # obtendo o usuário da sessão
+            'user': self.request.user,
+            # obtendo o carrinho da sessão
+            'cart': self.request.session.get('cart', {})
+        }
+
+        # renderizando o template com o contexto
+        return render(self.request, 'produto/summary.html', context)
 
 
 # definindo a view loadtestdata
@@ -236,7 +264,7 @@ class LoadTestData(View):
                 nome=f'Produto {x+1}',
                 descricao_curta=f'Descrição curta do Produto {x+1}',
                 descricao_longa=f'Descrição longa do Produto {x+1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-                )
+            )
 
         # obtendo todos os produtos cadastrados
         produtos = Produto.objects.all()
@@ -252,9 +280,9 @@ class LoadTestData(View):
 
                 # sorteando se existirá promoção
                 if random.randint(0, 1):
-                    preco_promocional=round(random.uniform(10, 500), 2)
+                    preco_promocional = round(random.uniform(10, 500), 2)
                 else:
-                    preco_promocional=None
+                    preco_promocional = None
 
                 # cadastrando a nova variação
                 variacao = Variacao.objects.create(
