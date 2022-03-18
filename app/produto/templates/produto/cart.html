@@ -40,14 +40,21 @@
         </div>
         <div class="col-lg mt-auto">
     
+            {# se o usuario estiver logado #}
             {% if request.user.is_authenticated %}
-            <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:summary' %}">
-                Comprar
-            </a>
+
+                {# renderizando o botão Comprar #}
+                <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:summary' %}">
+                    Comprar
+                </a>
+
+            {# senão #}
             {% else %}
-            <a class="btn btn-lg btn-block btn-primary" href="#">
-                Entrar ou cadastrar e comprar
-            </a>
+
+                {# renderizando o botão Entrar #}
+                <a class="btn btn-lg btn-block btn-primary" href="{% url 'perfil:create' %}">
+                    Entre/Cadastre-se para comprar
+                </a>
             {% endif %}
         </div>
     </div>

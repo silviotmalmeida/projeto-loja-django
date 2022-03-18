@@ -177,7 +177,7 @@ class Create(BaseCustomView):
         messages.success(self.request, 'Operação realizada com sucesso!')
 
         # reabre o template sem os dados no POST
-        return redirect('perfil:create')
+        return redirect('produto:showcart')
 
 
 # definindo a view Login

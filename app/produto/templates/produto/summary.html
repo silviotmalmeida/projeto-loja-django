@@ -14,6 +14,7 @@
     <div class="col-lg">
         <h2>Resumo da sua compra</h2>
 
+        {# renderizando os dados do usuário #}
         <p class="lead">Dados do usuário</p>
         <p>Caso precise editar, <a href="{% url 'perfil:create' %}">clique aqui</a></p>
         <dl class="row">
@@ -33,6 +34,7 @@
             <dd class="col-lg-4">{{ user.email }}</dd>
         </dl>
 
+        {# renderizando os dados do endereço #}
         <p class="lead">Dados de endereço</p>
         <p>Caso precise editar, <a href="{% url 'perfil:create' %}">clique aqui</a></p>
         <dl class="row">
@@ -57,12 +59,12 @@
     </div>
 </div>
 
-
-
+{# renderizando o carrinho da sessão #}
 <div class="row mt-3">
     <div class="col">
         <h3>Resumo do carrinho</h3>
         
+        {# carregando o carrinho definido em partials/_cart.html #}
         {% include 'partials/_cart.html' %}
     </div>
 
@@ -74,6 +76,8 @@
     </div>
 </div>
 
+
+{# renderizando o botão de realizar pedido #}
 <div class="row">
     <div class="col">
         <a class="btn btn-block btn-primary btn-lg" href="{% url 'pedido:save' %}">

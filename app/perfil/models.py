@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 # importando dependência para levantar exceções de validação
 from django.forms import ValidationError
 # importando as bibliotecas de validação de CPF e CEP
-from loja.utils.valida_cpf import valida_cpf
-from loja.utils.valida_cep import valida_cep
+from utils.valida_cpf import valida_cpf
+from utils.valida_cep import valida_cep
 
 
 # criando a model de Perfil

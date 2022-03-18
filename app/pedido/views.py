@@ -13,7 +13,12 @@ class Pay(View):
 
 # definindo a view Save
 class Save(View):
-    pass
+
+    # definindo a resposta a uma requisição get
+    def get(self, *args, **kwargs):
+
+        # renderizando o template com o contexto
+        return render(self.request, 'pedido/save.html')
 
 
 # definindo a view Detail

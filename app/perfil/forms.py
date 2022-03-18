@@ -51,7 +51,7 @@ class UserForm(forms.ModelForm):
         # definindo a model
         model = User
         # definindo os campos a serem exibidos
-        fields = ('first_name', 'last_name', 'password',
+        fields = ('first_name', 'last_name', 'username', 'password',
                   'password2', 'email')        
 
     # definindo as validações do formulário
@@ -67,15 +67,21 @@ class UserForm(forms.ModelForm):
         validation_error_msgs = {}
 
         # obtendo os dados do formulário
+        username_data = data.get('username')
         email_data = data.get('email')
         password_data = cleaned.get('password')
         password2_data = cleaned.get('password2')
+
+        # consultando se o username já é utilizado
+        username_db = User.objects.filter(username=username_data).first()
 
         # consultando se o email já é utilizado
         email_db = User.objects.filter(email=email_data).first()
 
         # definindo os textos dos erros de validação
-        error_msg_email_exists = 'E-mail já existe'
+        error_msg_username_exists = 'Username já está sendo utilizado'
+        error_msg_username_change = 'Username não pode ser alterado'
+        error_msg_email_exists = 'E-mail já está sendo utilizado'
         error_msg_email_empty = 'E-mail não pode ser vazio'
         error_msg_password_match = 'As duas senhas não conferem'
         error_msg_password_short = 'Sua senha precisa de pelo menos 6 caracteres'
@@ -83,6 +89,11 @@ class UserForm(forms.ModelForm):
 
         # se o atributo de classe user estiver definido, trata-se de uma atualização
         if self.user:
+
+            # se o username do formulário for diferente do cadastrado no bd, houve uma alteração
+            if username_data != self.user.username:
+                # adiciona um erro de validação
+                validation_error_msgs['username'] = error_msg_username_change
 
             # se email não foi preenchido
             if not email_data:
@@ -110,7 +121,13 @@ class UserForm(forms.ModelForm):
                     validation_error_msgs['password'] = error_msg_password_short
 
         # se o atributo de classe user não estiver definido, trata-se de um novo cadastro
-        else:            
+        else:
+
+            # se o username já estiver sendo utilizado
+            if username_db:
+                # adiciona um erro de validação
+                validation_error_msgs['username'] = error_msg_username_exists
+
             # se email não foi preenchido
             if not email_data:
                 # adiciona um erro de validação

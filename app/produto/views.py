@@ -13,8 +13,19 @@ from django.contrib import messages
 # importando as models Produto e Variacao
 from .models import Produto, Variacao
 
-# biblioteca de números aleatórios
-import random
+# importando a model User do django
+from django.contrib.auth.models import User
+
+# importando a model Perfil
+from perfil.models import Perfil
+
+# importando as bibliotecas de validação de CPF e CEP
+from utils.valida_cpf import gera_cpf
+from utils.valida_cep import gera_cep
+from utils.date_utils import randomYYYYMMDD
+
+# biblioteca de sorteio aleatório
+from random import choice
 
 
 # definindo a view List
@@ -237,6 +248,22 @@ class Summary(View):
             # redireciona-o para a página de login
             return redirect('perfil:create')
 
+        # verificando se existe perfil para o usuário logado
+        perfil = Perfil.objects.filter(id_usuario=self.request.user).exists()
+
+        # se não existir perfil
+        if not perfil:
+            # envia mensagem de erro
+            messages.error(self.request, 'É necessário o preenchimento dos dados do usuário!')
+            # redireciona-o para a página de atualização do cadastro
+            return redirect('perfil:create')
+
+        if not self.request.session.get('cart'):
+            # envia mensagem de erro
+            messages.error(self.request, 'Seu carrinho está vazio!')
+            # redireciona-o para a página de carrinho
+            return redirect('produto:showcart')
+
         # definindo o contexto a ser passado ao template
         context = {
 
@@ -257,40 +284,80 @@ class LoadTestData(View):
     # definindo a resposta a uma requisição get
     def get(self, *args, **kwargs):
 
-        # criando os produtos
-        for x in range(50):
-            # cadastrando o novo produto
-            produto = Produto.objects.create(
-                nome=f'Produto {x+1}',
-                descricao_curta=f'Descrição curta do Produto {x+1}',
-                descricao_longa=f'Descrição longa do Produto {x+1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        # # criando os produtos
+        # for x in range(50):
+        #     # cadastrando o novo produto
+        #     produto = Produto.objects.create(
+        #         nome=f'Produto {x+1}',
+        #         descricao_curta=f'Descrição curta do Produto {x+1}',
+        #         descricao_longa=f'Descrição longa do Produto {x+1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        #     )
+
+        # # obtendo todos os produtos cadastrados
+        # produtos = Produto.objects.all()
+
+        # # iterando no array de produtos
+        # for produto in produtos:
+
+        #     # sorteando a quantidade de variações a serem criadas
+        #     qtd_variacoes = random.randint(0, 5)
+
+        #     # criando as variações
+        #     for x in range(qtd_variacoes):
+
+        #         # sorteando se existirá promoção
+        #         if random.randint(0, 1):
+        #             preco_promocional = round(random.uniform(10, 500), 2)
+        #         else:
+        #             preco_promocional = None
+
+        #         # cadastrando a nova variação
+        #         variacao = Variacao.objects.create(
+        #             id_produto=produto,
+        #             nome=f'Variacao {x+1} {produto.nome}',
+        #             preco=round(random.uniform(10, 500), 2),
+        #             preco_promocional=preco_promocional,
+        #             estoque=random.randint(0, 100),)
+
+        # criando os usuários
+        for x in range(1):
+            # cadastrando o novo usuário
+            user = User.objects.create_user(
+                first_name=f'Nome {x+1}',
+                last_name=f'Sobrenome {x+1}',
+                username=f'usuario{x+1}',
+                password=f'123456',
+                email=f'usuario{x+1}@email.com',
             )
 
-        # obtendo todos os produtos cadastrados
-        produtos = Produto.objects.all()
+            # obtendo um cpf
+            cpf = gera_cpf()
 
-        # iterando no array de produtos
-        for produto in produtos:
+            # obtendo um cep
+            cep = gera_cep()
 
-            # sorteando a quantidade de variações a serem criadas
-            qtd_variacoes = random.randint(0, 5)
+            # obtendo um estado
+            states = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
+                      'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
+                      'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+                      ]
+            state = choice(states)
 
-            # criando as variações
-            for x in range(qtd_variacoes):
+            birth_date = randomYYYYMMDD()
 
-                # sorteando se existirá promoção
-                if random.randint(0, 1):
-                    preco_promocional = round(random.uniform(10, 500), 2)
-                else:
-                    preco_promocional = None
-
-                # cadastrando a nova variação
-                variacao = Variacao.objects.create(
-                    id_produto=produto,
-                    nome=f'Variacao {x+1} {produto.nome}',
-                    preco=round(random.uniform(10, 500), 2),
-                    preco_promocional=preco_promocional,
-                    estoque=random.randint(0, 100),)
+            # cadastrando o perfil do novo usuário
+            perfil = Perfil.objects.create(
+                id_usuario=user,
+                data_nascimento=birth_date,
+                cpf=cpf,
+                logradouro=f'Rua do usuário {x+1}',
+                numero=f'Número do usuário {x+1}',
+                complemento=f'Complemento do usuário {x+1}',
+                bairro=f'Bairro do usuário {x+1}',
+                cep=cep,
+                cidade=f'Cidade do usuário {x+1}',
+                estado=state,
+            )
 
         # redirecionando para a página de início
         return redirect('produto:list')
