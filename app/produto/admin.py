@@ -39,7 +39,7 @@ class VariacaoAdmin(admin.ModelAdmin):
 
     # definindo as colunas a serem exibidas
     list_display = ('id', 'nome', 'preco',
-                    'preco_promocional', 'id_produto')
+                    'preco_promocional', 'estoque', 'id_produto')
 
     # definindo em quais colunas serão colocados links de edição
     list_display_links = ('id', 'nome',)

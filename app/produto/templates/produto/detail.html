@@ -36,6 +36,9 @@
             {# inserindo o span do preço tachado #}
             <span id="variation-preco" class="lead product-old-price text-muted"></span>
 
+            {# inserindo o p do estoque #}
+            <p id="variation-estoque" class="lead text-muted"></p>
+
             </p>
 
             {# se existir variação, exibe o select #}
@@ -51,6 +54,7 @@
                                 {# inserindo a opção default #}
                                 <option data-preco=""
                                     data-preco-promocional=""
+                                    data-estoque=""
                                     value="" selected="selected">{% if produto.tipo == 'S' %}Produto indisponível{% else %}Selecione um produto{% endif %}
                                 </option>
                             
@@ -60,6 +64,7 @@
                                 {# inserindo as variações #}
                                 <option data-preco="{{ variacao.preco|currency_format }}"
                                     data-preco-promocional="{{ variacao.preco_promocional|currency_format }}"
+                                    data-estoque="{{ variacao.estoque }}"
                                     value="{{ variacao.id }}">{{ variacao.nome }}
                                 </option>
                             {% endfor %}

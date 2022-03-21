@@ -13,6 +13,9 @@
     "variation-preco-promocional"
   );
 
+  // obtendo o p com o estoque
+  variation_estoque = document.getElementById("variation-estoque");
+
   // se o select de variação não for encontrado, encerra o script
   if (!select_variacao) {
     return;
@@ -29,37 +32,36 @@
     preco = this.options[this.selectedIndex].getAttribute("data-preco");
 
     // convertendo o preço para float
-    preco_float = preco.replace("R$ ", "").replace(",",".");
+    preco_float = preco.replace("R$ ", "").replace(",", ".");
     preco_float = Number.parseFloat(preco_float);
-    
+
     // atribui o preço promocional baseado na variação selecionada
     preco_promocional = this.options[this.selectedIndex].getAttribute(
       "data-preco-promocional"
     );
 
     // convertendo o preço promocional para float
-    preco_promocional_float = preco_promocional.replace("R$ ", "").replace(",",".");
+    preco_promocional_float = preco_promocional
+      .replace("R$ ", "")
+      .replace(",", ".");
     preco_promocional_float = Number.parseFloat(preco_promocional_float);
 
-    console.log(preco_float)
-    console.log(preco_promocional_float)
-
-    
+    // atribui o estoque baseado na variação selecionada
+    estoque = this.options[this.selectedIndex].getAttribute("data-estoque");
 
     // se o preço for maior que o preço promocional
     if (preco_float > preco_promocional_float) {
-
       // atualizando o span de preço
       variation_preco.innerHTML = preco;
       // atualizando o span de preço tachado
       variation_preco_promocional.innerHTML = preco_promocional;
-    }
-    else{
-
+    } else {
       // atualizando o span de preço
       variation_preco.innerHTML = "";
-      // atualizando o span de preço
+      // atualizando o span de preço tachado
       variation_preco_promocional.innerHTML = preco;
     }
+    // atualizando o p de estoque
+    variation_estoque.innerHTML = `${estoque} em estoque`;
   });
 })();
