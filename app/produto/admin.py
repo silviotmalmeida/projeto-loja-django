@@ -51,7 +51,7 @@ class VariacaoAdmin(admin.ModelAdmin):
     search_fields = ('nome',)
 
     # definindo as colunas liberadas para ediçao na tela de listagem
-    list_editable = ('preco', 'preco_promocional',)
+    list_editable = ('preco', 'preco_promocional', 'estoque',)
 
 
 # registrando as models para exibição na área administrativa

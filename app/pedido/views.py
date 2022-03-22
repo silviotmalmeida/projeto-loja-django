@@ -1,9 +1,12 @@
 # importação default
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 
 # importando os tipos de views a serem utilizadas
 from django.views.generic.list import ListView
 from django.views import View
+
+# importando a model Pedido e ItemPedido
+from .models import Pedido, ItemPedido
 
 # importando a model Variacao
 from produto.models import Variacao
@@ -11,10 +14,16 @@ from produto.models import Variacao
 # importando as mensagens do django
 from django.contrib import messages
 
+# importação biblioteca de funções genéricas
+from utils import utils
+
 
 # definindo a view Pay
 class Pay(View):
-    pass
+    template_name = 'pedido/pay.html'
+    model = Pedido
+    pk_url_kwarg = 'pk'
+    context_object_name = 'pedido'
 
 
 # definindo a view Save
@@ -68,55 +77,68 @@ class Save(View):
             # obtendo o id da variação da iteração atual
             vid = str(variacao.id)
 
-            # obtendo o estoque disponível
-            estoque = variacao.estoque
-
             # obtendo a quantidade inserida no carrinho
-            qtd_cart = cart[vid]['quantidade']
+            qtd_cart = cart[vid]['qtd']
 
             # obtendo o preço no carrinho
-            preco_unt = cart[vid]['preco_unitario']
+            price_cart = cart[vid]['preco_unitario']
 
             # obtendo o preço promocional no carrinho
-            preco_unt_promo = cart[vid]['preco_unitario_promocional']
+            promotion_price_cart = cart[vid]['preco_unitario_promocional']
 
             # inicializando a flag de alteração do carrinho
             refresh_cart = False
+
+            # se o preço estiver diferente
+            if variacao.preco != price_cart:
+
+                # ajusta os preços
+                cart[vid]['preco_unitario'] = variacao.preco
+                cart[vid]['preco_total'] = qtd_cart * variacao.preco
+
+                # atualizando a variável
+                price_cart = cart[vid]['preco_unitario']
+
+                # seta a flag de alteração do carrinho
+                refresh_cart = True
+
+            # se o preço promocional estiver diferente
+            if variacao.preco_promocional != promotion_price_cart:
+
+                # ajusta os preços
+                cart[vid]['preco_unitario_promocional'] = variacao.preco_promocional
+                cart[vid]['preco_total_promocional'] = qtd_cart * \
+                    variacao.preco_promocional
+
+                # atualizando a variável
+                promotion_price_cart = cart[vid]['preco_unitario_promocional']
+
+                # seta a flag de alteração do carrinho
+                refresh_cart = True
 
             # se o estoque for insuficiente
             if variacao.estoque < qtd_cart:
 
                 # ajusta a quantidade ao estoque disponível,
-                # bem como os preços totalizadosno carrinho
-                cart[vid]['quantidade'] = estoque
-                cart[vid]['preco_quantitativo'] = estoque * preco_unt
-                cart[vid]['preco_quantitativo_promocional'] = estoque * \
-                    preco_unt_promo
+                # bem como os preços totalizados no carrinho
+                cart[vid]['qtd'] = variacao.estoque
+                cart[vid]['preco_total'] = variacao.estoque * price_cart
+                cart[vid]['preco_total_promocional'] = variacao.estoque * \
+                    promotion_price_cart
+
+                # atualizando a variável
+                qtd_cart = cart[vid]['qtd']
 
                 # seta a flag de alteração do carrinho
                 refresh_cart = True
-
-            # se o estoque for insuficiente
-            if estoque < qtd_cart:
-
-                # ajusta a quantidade ao estoque disponível,
-                # bem como os preços totalizadosno carrinho
-                cart[vid]['quantidade'] = estoque
-                cart[vid]['preco_quantitativo'] = estoque * preco_unt
-                cart[vid]['preco_quantitativo_promocional'] = estoque * \
-                    preco_unt_promo
-
-                # seta a flag de alteração do carrinho
-                refresh_cart = True
-                
 
         # se houve alterações no carrinho
         if refresh_cart:
 
             # definindo a mensagem de alteração do carrinho
             error_msg_estoque = 'Houve alteração em alguns itens '\
-                    'do carrinho em virtude de atualização de preços '\
-                    'e/ou estoque. Favor verifique novamente seu carrinho'
+                'do seu carrinho em virtude de atualização de preços '\
+                'e/ou estoque. Favor verifique novamente seu carrinho'
 
             # exibe a mensagem de alteração
             messages.error(
@@ -126,49 +148,57 @@ class Save(View):
 
             # salva o estado da sessão
             self.request.session.save()
-            
+
             # redireciona para a página do carrinho
             return redirect('produto:showcart')
 
-        # qtd_total_carrinho = utils.cart_total_qtd(carrinho)
-        # valor_total_carrinho = utils.cart_totals(carrinho)
+        # obtendo a quantidade total de itens no carrinho
+        qtd_items_cart = utils.sum_items(cart)
 
-        # pedido = Pedido(
-        #     usuario=self.request.user,
-        #     total=valor_total_carrinho,
-        #     qtd_total=qtd_total_carrinho,
-        #     status='C',
-        # )
+        # obtendo o valor total dos itens no carrinho
+        price_total_cart = utils.sum_prices(cart)
 
-        # pedido.save()
+        # criando o objeto Pedido com os dados do carrinho
+        pedido = Pedido(
+            usuario=self.request.user,
+            total=price_total_cart,
+            qtd_total=qtd_items_cart,
+            status='C',
+        )
 
-        # ItemPedido.objects.bulk_create(
-        #     [
-        #         ItemPedido(
-        #             pedido=pedido,
-        #             produto=v['produto_nome'],
-        #             produto_id=v['produto_id'],
-        #             variacao=v['variacao_nome'],
-        #             variacao_id=v['variacao_id'],
-        #             preco=v['preco_quantitativo'],
-        #             preco_promocional=v['preco_quantitativo_promocional'],
-        #             quantidade=v['quantidade'],
-        #             imagem=v['imagem'],
-        #         ) for v in carrinho.values()
-        #     ]
-        # )
+        # salvando no bd
+        pedido.save()
 
-        # del self.request.session['carrinho']
+        # criando os registros dos itens do pedido
+        # iterando sobre as variações presentes no carrinho
+        ItemPedido.objects.bulk_create(
+            [
+                ItemPedido(
+                    pedido=pedido,
+                    produto=v['produto_nome'],
+                    produto_id=v['produto_id'],
+                    variacao=v['variacao_nome'],
+                    variacao_id=v['variacao_id'],
+                    preco=v['preco_unitario'],
+                    preco_promocional=v['preco_unitario_promocional'],
+                    quantidade=v['qtd'],
+                    imagem=v['imagem'],
+                ) for v in cart.values()
+            ]
+        )
 
-        # return redirect(
-        #     reverse(
-        #         'pedido:pagar',
-        #         kwargs={
-        #             'pk': pedido.pk
-        #         }
-        #     )
-        # )
-        return redirect('perfil:create')
+        # apagando o carrinho da sessão
+        del self.request.session['cart']
+
+        # redireciona para a página do pedido
+        return redirect(
+            reverse(
+                'pedido:pay',
+                kwargs={
+                    'pk': pedido.pk
+                }
+            )
+        )
 
 
 # definindo a view Detail
