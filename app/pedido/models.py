@@ -14,6 +14,9 @@ class Pedido(models.Model):
     # criando o atributo total como float
     total = models.FloatField(verbose_name='Valor Total (R$)')
 
+    # criando o atributo quantidade como inteiro positivo
+    quantidade = models.PositiveIntegerField(verbose_name='Quantidade Total de Itens')
+
     # criando o atributo status com opções pré-definidas
     status = models.CharField(default='C',
                               max_length=1,

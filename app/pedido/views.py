@@ -20,17 +20,22 @@ from utils import utils
 
 # definindo a view Pay
 class Pay(View):
+
+    # definindo o template a ser utilizado
     template_name = 'pedido/pay.html'
+
+    # definindo a model a ser utilizada
     model = Pedido
+
+    # determinando o termo a ser considerado como id na definição da url
     pk_url_kwarg = 'pk'
+
+    # determinando o nome do objeto a ser passado ao template
     context_object_name = 'pedido'
 
 
 # definindo a view Save
 class Save(View):
-
-    # atribuindo o template a ser utilizado
-    template_name = 'pedido/pay.html'
 
     # definindo a resposta a uma requisição get
     def get(self, *args, **kwargs):
@@ -66,6 +71,7 @@ class Save(View):
         cart_variacao_ids = [v for v in cart]
 
         # obtendo os dados atuais das respectivas variações no bd
+        # a clausula select_related otimiza o número de consultas ao bd
         bd_variacoes = list(
             Variacao.objects.select_related('id_produto')
             .filter(id__in=cart_variacao_ids)
@@ -158,11 +164,26 @@ class Save(View):
         # obtendo o valor total dos itens no carrinho
         price_total_cart = utils.sum_prices(cart)
 
+        # iterando sobre o array de variações para atualização do estoque no bd
+        for variacao in bd_variacoes:
+
+            # obtendo o id da variação da iteração atual
+            vid = str(variacao.id)
+
+            # obtendo a quantidade inserida no carrinho
+            qtd_cart = cart[vid]['qtd']
+
+            # atualizando o estoque
+            variacao.estoque = variacao.estoque - qtd_cart
+
+        # atualizando os registros em lote no bd
+        Variacao.objects.bulk_update(bd_variacoes, fields = ['estoque'])
+
         # criando o objeto Pedido com os dados do carrinho
         pedido = Pedido(
-            usuario=self.request.user,
+            id_usuario=self.request.user,
             total=price_total_cart,
-            qtd_total=qtd_items_cart,
+            quantidade=qtd_items_cart,
             status='C',
         )
 
@@ -174,11 +195,11 @@ class Save(View):
         ItemPedido.objects.bulk_create(
             [
                 ItemPedido(
-                    pedido=pedido,
-                    produto=v['produto_nome'],
-                    produto_id=v['produto_id'],
-                    variacao=v['variacao_nome'],
-                    variacao_id=v['variacao_id'],
+                    id_pedido=pedido,
+                    nome_produto=v['produto_nome'],
+                    id_produto=v['produto_id'],
+                    id_variacao=v['variacao_id'],
+                    nome_variacao=v['variacao_nome'],
                     preco=v['preco_unitario'],
                     preco_promocional=v['preco_unitario_promocional'],
                     quantidade=v['qtd'],
@@ -190,15 +211,18 @@ class Save(View):
         # apagando o carrinho da sessão
         del self.request.session['cart']
 
-        # redireciona para a página do pedido
-        return redirect(
-            reverse(
-                'pedido:pay',
-                kwargs={
-                    'pk': pedido.pk
-                }
-            )
-        )
+        # # redireciona para a página do pedido
+        # return redirect(
+        #     reverse(
+        #         'pedido:pay',
+        #         kwargs={
+        #             'pk': pedido.pk
+        #         }
+        #     )
+        # )
+
+        # redireciona para a página do carrinho
+        return redirect('produto:showcart')
 
 
 # definindo a view Detail

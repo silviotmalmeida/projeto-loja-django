@@ -25,7 +25,7 @@ from utils.valida_cep import gera_cep
 from utils.date_utils import randomYYYYMMDD
 
 # biblioteca de sorteio aleatório
-from random import random, choice
+from random import randint, uniform, choice
 
 
 # definindo a view List
@@ -300,14 +300,14 @@ class LoadTestData(View):
         for produto in produtos:
 
             # sorteando a quantidade de variações a serem criadas
-            qtd_variacoes = random.randint(0, 5)
+            qtd_variacoes = randint(0, 5)
 
             # criando as variações
             for x in range(qtd_variacoes):
 
                 # sorteando se existirá promoção
-                if random.randint(0, 1):
-                    preco_promocional = round(random.uniform(10, 500), 2)
+                if randint(0, 1):
+                    preco_promocional = round(uniform(10, 500), 2)
                 else:
                     preco_promocional = None
 
@@ -315,12 +315,12 @@ class LoadTestData(View):
                 variacao = Variacao.objects.create(
                     id_produto=produto,
                     nome=f'Variacao {x+1} {produto.nome}',
-                    preco=round(random.uniform(10, 500), 2),
+                    preco=round(uniform(10, 500), 2),
                     preco_promocional=preco_promocional,
-                    estoque=random.randint(0, 100),)
+                    estoque=randint(0, 100),)
 
         # criando os usuários
-        for x in range(1):
+        for x in range(25):
             # cadastrando o novo usuário
             user = User.objects.create_user(
                 first_name=f'Nome {x+1}',
