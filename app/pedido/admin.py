@@ -19,7 +19,7 @@ class PedidoAdmin(admin.ModelAdmin):
     inlines = [ItemPedidoInline]
 
     # definindo as colunas a serem exibidas
-    list_display = ('id', 'total', 'status', 'id_usuario',)
+    list_display = ('id', 'total', 'quantidade', 'status', 'id_usuario',)
 
     # definindo em quais colunas serão colocados links de edição
     list_display_links = ('id',)

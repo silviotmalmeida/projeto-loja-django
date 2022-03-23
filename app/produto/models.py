@@ -75,7 +75,7 @@ class Produto(models.Model):
         # se o slug não foi informado
         if not self.slug:
             # cria um slug com o nome e um número aleatório
-            slug = f'{slugify(self.nome)}-{random.randint(1, 100)}'
+            slug = f'{slugify(self.nome)}-{random.randint(1, 999)}'
             # atribuindo o slug
             self.slug = slug
 

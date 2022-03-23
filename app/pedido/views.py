@@ -162,7 +162,7 @@ class Save(View):
         qtd_items_cart = utils.sum_items(cart)
 
         # obtendo o valor total dos itens no carrinho
-        price_total_cart = utils.sum_prices(cart)
+        price_total_cart = round(utils.sum_prices(cart), 2)
 
         # iterando sobre o array de variações para atualização do estoque no bd
         for variacao in bd_variacoes:
