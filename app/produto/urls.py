@@ -25,5 +25,5 @@ urlpatterns = [
     path('summary/', views.Summary.as_view(), name='summary'),
 
     # definindo a url para carregamento de dados de teste
-    path('loadtestdata/', views.LoadTestData.as_view(), name='loadtestdata'),
+    path('loadtestdata/', views.loadtestdata, name='loadtestdata'),
 ]

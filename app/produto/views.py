@@ -284,201 +284,206 @@ class Summary(View):
         return render(self.request, 'produto/summary.html', context)
 
 
-# definindo a view loadtestdata
+# definindo o método loadtestdata
 # tem a função de carregar uma massa de dados de teste
-class LoadTestData(View):
+def loadtestdata(request):
 
-    # definindo a resposta a uma requisição get
-    def get(self, *args, **kwargs):
+    # obtendo todos os produtos cadastrados
+    produtos = Produto.objects.all()
+
+    # se não existirem produtos cadastrados
+    if not produtos:
+
+        # criando os produtos
+        for x in range(50):
+            # cadastrando o novo produto
+            produto = Produto.objects.create(
+                nome=f'Produto {x+1}',
+                descricao_curta=f'Descrição curta do Produto {x+1}',
+                descricao_longa=f'Descrição longa do Produto {x+1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+            )
 
         # obtendo todos os produtos cadastrados
         produtos = Produto.objects.all()
 
-        # se não existirem produtos cadastrados
-        if not produtos:
+        # iterando no array de produtos
+        for produto in produtos:
 
-            # criando os produtos
-            for x in range(50):
-                # cadastrando o novo produto
-                produto = Produto.objects.create(
-                    nome=f'Produto {x+1}',
-                    descricao_curta=f'Descrição curta do Produto {x+1}',
-                    descricao_longa=f'Descrição longa do Produto {x+1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-                )
+            # criando as variações
+            for x in range(randint(0, 5)):
 
-            # obtendo todos os produtos cadastrados
-            produtos = Produto.objects.all()
+                # sorteando se existirá promoção
+                if randint(0, 1):
+                    preco_promocional = round(uniform(10, 500), 2)
+                else:
+                    preco_promocional = None
 
-            # iterando no array de produtos
-            for produto in produtos:
+                # cadastrando a nova variação
+                variacao = Variacao.objects.create(
+                    id_produto=produto,
+                    nome=f'Variacao {x+1} {produto.nome}',
+                    preco=round(uniform(10, 500), 2),
+                    preco_promocional=preco_promocional,
+                    estoque=randint(0, 100),)
 
-                # criando as variações
-                for x in range(randint(0, 5)):
+        # obtendo todos as variações cadastradas
+        variacoes = Variacao.objects.all()
 
-                    # sorteando se existirá promoção
-                    if randint(0, 1):
-                        preco_promocional = round(uniform(10, 500), 2)
+        # criando os usuários
+        for u in range(25):
+            # cadastrando o novo usuário
+            user = User.objects.create_user(
+                first_name=f'Nome {u+1}',
+                last_name=f'Sobrenome {u+1}',
+                username=f'usuario{u+1}',
+                password=f'123456',
+                email=f'usuario{u+1}@email.com',
+            )
+
+            # obtendo um cpf
+            cpf = gera_cpf()
+
+            # obtendo um cep
+            cep = gera_cep()
+
+            # obtendo um número aleatório
+            numero = randint(0, 999)
+
+            # obtendo um estado através de sorteio aleatório
+            states = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
+                      'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
+                      'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+                      ]
+            state = choice(states)
+
+            # obtendo data de nascimento aleatória
+            birth_date = randomYYYYMMDD()
+
+            # cadastrando o perfil do novo usuário
+            perfil = Perfil.objects.create(
+                id_usuario=user,
+                data_nascimento=birth_date,
+                cpf=cpf,
+                logradouro=f'Rua do usuário {u+1}',
+                numero=numero,
+                complemento=f'Complemento do usuário {u+1}',
+                bairro=f'Bairro do usuário {u+1}',
+                cep=cep,
+                cidade=f'Cidade do usuário {u+1}',
+                estado=state,
+            )
+
+            # criando os carrinhos
+            for y in range(randint(0, 5)):
+
+                # inicializando o carrinho vazio
+                cart = {}
+
+                # obtendo as variações a serem inseridas no carrinho
+                for z in range(randint(1, 5)):
+
+                    # sorteando uma variação
+                    variacao = choice(variacoes)
+
+                    # obtendo o produto da variação sorteada
+                    produto = variacao.id_produto
+
+                    # obtendo uma quantidade aleatória
+                    qtd = randint(1, 10)
+
+                    # obtendo a url da imagem do produto
+                    image = '/default.png' if not produto.imagem else produto.imagem.name
+
+                    # inserindo a variação no carrinho
+                    # se já existir variação de mesmo tipo no carrinho
+                    if variacao.id in cart:
+
+                        # obtendo a quantidade presente no carrinho
+                        qtd_cart = cart[variacao.id]['qtd']
+                        # incrementando a quantidade
+                        qtd_cart += qtd
+
+                        # atualizando a quantidade e preços no carrinho
+                        cart[variacao.id]['qtd'] = qtd_cart
+                        cart[variacao.id]['preco_total'] = round(
+                            variacao.preco * qtd_cart, 2)
+                        if variacao.preco_promocional:
+                            cart[variacao.id]['preco_total_promocional'] = round(
+                                variacao.preco_promocional * qtd_cart, 2)
+
+                    # senão
                     else:
-                        preco_promocional = None
 
-                    # cadastrando a nova variação
-                    variacao = Variacao.objects.create(
-                        id_produto=produto,
-                        nome=f'Variacao {x+1} {produto.nome}',
-                        preco=round(uniform(10, 500), 2),
-                        preco_promocional=preco_promocional,
-                        estoque=randint(0, 100),)
+                        # calculando o preço total
+                        preco_total = round(variacao.preco * qtd, 2)
 
-            # obtendo todos as variações cadastradas
-            variacoes = Variacao.objects.all()
-
-            # criando os usuários
-            for u in range(25):
-                # cadastrando o novo usuário
-                user = User.objects.create_user(
-                    first_name=f'Nome {u+1}',
-                    last_name=f'Sobrenome {u+1}',
-                    username=f'usuario{u+1}',
-                    password=f'123456',
-                    email=f'usuario{u+1}@email.com',
-                )
-
-                # obtendo um cpf
-                cpf = gera_cpf()
-
-                # obtendo um cep
-                cep = gera_cep()
-
-                # obtendo um número aleatório
-                numero = randint(0, 999)
-
-                # obtendo um estado através de sorteio aleatório
-                states = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
-                          'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
-                          'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
-                          ]
-                state = choice(states)
-
-                # obtendo data de nascimento aleatória
-                birth_date = randomYYYYMMDD()
-
-                # cadastrando o perfil do novo usuário
-                perfil = Perfil.objects.create(
-                    id_usuario=user,
-                    data_nascimento=birth_date,
-                    cpf=cpf,
-                    logradouro=f'Rua do usuário {u+1}',
-                    numero=numero,
-                    complemento=f'Complemento do usuário {u+1}',
-                    bairro=f'Bairro do usuário {u+1}',
-                    cep=cep,
-                    cidade=f'Cidade do usuário {u+1}',
-                    estado=state,
-                )
-
-                # criando os carrinhos
-                for y in range(randint(0, 5)):
-
-                    # inicializando o carrinho vazio
-                    cart = {}
-
-                    # obtendo as variações a serem inseridas no carrinho
-                    for z in range(randint(1, 5)):
-
-                        # sorteando uma variação
-                        variacao = choice(variacoes)
-
-                        # obtendo o produto da variação sorteada
-                        produto = variacao.id_produto
-
-                        # obtendo uma quantidade aleatória
-                        qtd = randint(1, 10)
-
-                        # obtendo a url da imagem do produto
-                        image = '/default.png' if not produto.imagem else produto.imagem.name
-
-                        # inserindo a variação no carrinho
-                        # se já existir variação de mesmo tipo no carrinho
-                        if variacao.id in cart:
-
-                            # obtendo a quantidade presente no carrinho
-                            qtd_cart = cart[variacao.id]['qtd']
-                            # incrementando a quantidade
-                            qtd_cart += qtd
-
-                            # atualizando a quantidade e preços no carrinho
-                            cart[variacao.id]['qtd'] = qtd_cart
-                            cart[variacao.id]['preco_total'] = round(
-                                variacao.preco * qtd_cart, 2)
-                            if variacao.preco_promocional:
-                                cart[variacao.id]['preco_total_promocional'] = round(
-                                    variacao.preco_promocional * qtd_cart, 2)
-
+                        # se existir preço promocional
+                        if variacao.preco_promocional:
+                            # calculando o preço total promocional
+                            preco_total_promocional = round(
+                                variacao.preco_promocional * qtd, 2)
                         # senão
                         else:
+                            # deixa o valor original
+                            preco_total_promocional = variacao.preco_promocional
 
-                            # calculando o preço total
-                            preco_total = round(variacao.preco * qtd, 2)
+                        # inserindo a variação no carrinho
+                        cart[variacao.id] = {
+                            'produto_id': produto.id,
+                            'produto_nome': produto.nome,
+                            'variacao_id': variacao.id,
+                            'variacao_nome': variacao.nome,
+                            'preco_unitario': variacao.preco,
+                            'preco_unitario_promocional': variacao.preco_promocional,
+                            'preco_total': preco_total,
+                            'preco_total_promocional': preco_total_promocional,
+                            'qtd': qtd,
+                            'imagem': image,
+                        }
 
-                            # se existir preço promocional
-                            if variacao.preco_promocional:
-                                # calculando o preço total promocional
-                                preco_total_promocional = round(
-                                    variacao.preco_promocional * qtd, 2)
-                            # senão
-                            else:
-                                # deixa o valor original
-                                preco_total_promocional = variacao.preco_promocional
+                # obtendo a quantidade total de itens no carrinho
+                qtd_items_cart = utils.sum_items(cart)
 
-                            # inserindo a variação no carrinho
-                            cart[variacao.id] = {
-                                'produto_id': produto.id,
-                                'produto_nome': produto.nome,
-                                'variacao_id': variacao.id,
-                                'variacao_nome': variacao.nome,
-                                'preco_unitario': variacao.preco,
-                                'preco_unitario_promocional': variacao.preco_promocional,
-                                'preco_total': preco_total,
-                                'preco_total_promocional': preco_total_promocional,
-                                'qtd': qtd,
-                                'imagem': image,
-                            }
+                # obtendo o valor total dos itens no carrinho
+                price_total_cart = round(utils.sum_prices(cart), 2)
 
-                    # obtendo a quantidade total de itens no carrinho
-                    qtd_items_cart = utils.sum_items(cart)
+                # obtendo um status através de sorteio aleatório
+                status_list = ['A', 'C', 'R', 'P', 'E', 'F']
+                status = choice(status_list)
 
-                    # obtendo o valor total dos itens no carrinho
-                    price_total_cart = round(utils.sum_prices(cart), 2)
+                # criando o objeto Pedido com os dados do carrinho
+                pedido = Pedido.objects.create(
+                    id_usuario=user,
+                    total=price_total_cart,
+                    quantidade=qtd_items_cart,
+                    status=status,
+                )
 
-                    # obtendo um status através de sorteio aleatório
-                    status_list = ['A', 'C', 'R', 'P', 'E', 'F']
-                    status = choice(status_list)
+                # criando os registros dos itens do pedido
+                # iterando sobre as variações presentes no carrinho
+                ItemPedido.objects.bulk_create(
+                    [
+                        ItemPedido(
+                            id_pedido=pedido,
+                            nome_produto=v['produto_nome'],
+                            id_produto=v['produto_id'],
+                            id_variacao=v['variacao_id'],
+                            nome_variacao=v['variacao_nome'],
+                            preco=v['preco_unitario'],
+                            preco_promocional=v['preco_unitario_promocional'],
+                            quantidade=v['qtd'],
+                            imagem=v['imagem'],
+                        ) for v in cart.values()
+                    ]
+                )
 
-                    # criando o objeto Pedido com os dados do carrinho
-                    pedido = Pedido.objects.create(
-                        id_usuario=user,
-                        total=price_total_cart,
-                        quantidade=qtd_items_cart,
-                        status=status,
-                    )
+        # envia mensagem
+        messages.success(request, 'Dados de teste carregados!')
 
-                    # criando os registros dos itens do pedido
-                    # iterando sobre as variações presentes no carrinho
-                    ItemPedido.objects.bulk_create(
-                        [
-                            ItemPedido(
-                                id_pedido=pedido,
-                                nome_produto=v['produto_nome'],
-                                id_produto=v['produto_id'],
-                                id_variacao=v['variacao_id'],
-                                nome_variacao=v['variacao_nome'],
-                                preco=v['preco_unitario'],
-                                preco_promocional=v['preco_unitario_promocional'],
-                                quantidade=v['qtd'],
-                                imagem=v['imagem'],
-                            ) for v in cart.values()
-                        ]
-                    )
+    # senão
+    else:
+        # envia mensagem
+        messages.error(request, 'Já existem dados no BD!')
 
-        # redirecionando para a página inicial
-        return redirect('produto:list')
+    # redirecionando para a página inicial
+    return redirect('produto:list')
