@@ -1,0 +1,91 @@
+{# extende o arquivo do template global base.html #}
+{% extends 'base.html' %}
+
+{# carregando o módulo de filtros personalizados #}
+{% load customizedFilters %}
+
+{# definindo o title a ser inserido no base.html #}
+{% block title %}Listagem de Pedidos{% endblock %}
+
+{# criando o bloco content a ser inserido no base.html #}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card-columns">
+      {# iterando sobre o array de pedidos definido na view #}
+      {% for pedido in pedidos %}
+
+      <div class="card">
+
+        {# inserindo o link para a página de detalhes na imagem #}
+        <a href="{{ produto.slug }}">
+
+          {# inserindo a imagem #}
+          {# se existir imagem cadastrada, adiciona no template #}
+          {# senão utiliza a imagem default #}
+          <img
+            class="card-img-top"
+            src="{% if produto.imagem %}{{ produto.imagem.url }}{% else %}{{ '/media/default.png' }}{% endif %}"
+            alt="{{ produto.nome }}"
+          />
+        </a>
+
+        {# inserindo os dados do produto #}
+        <div class="card-body">
+          <h5 class="card-title">{{ produto.descricao_curta }}</h5>
+          <p class="card-text">{{ produto.descricao_longa }}</p>
+          <div class="container product-price-block text-center">
+
+            {# se existir variação, exibe o termo "A partir de: "  #}
+            {% if produto.disponivel == True %}
+              <span class="product-text-price">A partir de: </span> 
+            
+              {# se existir promoção, exibe o preço cortado e o preço promocional destacado  #}
+              {% if produto.preco_marketing_promocional %}              
+                <span class="product-price">{{ produto.preco_marketing_promocional|currency_format }}</span>
+                <span class="product-old-price text-muted">{{ produto.preco_marketing|currency_format }}</span>
+
+              {# senão, exibe somente o preço destacado  #}
+              {% else %}
+                <span class="product-price">{{ produto.preco_marketing|currency_format }}</span>
+
+              {% endif %}
+
+              {# exibe o botão Comprar #}
+              <div
+                class="card-footer bg-transparent border-top-light-custom text-center"
+              >
+                {# inserindo o link para a página de detalhes #}
+                <a href="{{ produto.slug }}" class="btn btn-primary btn-sm m-1 btn-block">
+                  <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                  Comprar
+                </a>
+              </div>
+
+            {% else%}
+
+              {# exibe mensagem de produto indisponível #}
+              <span class="product-price text-danger">Produto indisponível</span> 
+
+            {% endif %}
+          </div>
+        </div>
+
+
+        
+      </div>
+
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col">
+    {# carregando a paginação definida em partial/_pagination.html #}
+    {% include 'partials/_pagination.html' %}
+  </div>
+</div>
+
+{% endblock %}

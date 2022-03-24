@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, reverse
 
 # importando os tipos de views a serem utilizadas
 from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.views import View
 
 # importando a model Pedido e ItemPedido
@@ -19,7 +20,7 @@ from utils import utils
 
 
 # definindo a view Pay
-class Pay(View):
+class Pay(DetailView):
 
     # definindo o template a ser utilizado
     template_name = 'pedido/pay.html'
@@ -163,32 +164,15 @@ class Save(View):
 
         # obtendo o valor total dos itens no carrinho
         price_total_cart = round(utils.sum_prices(cart), 2)
-
-        # iterando sobre o array de variações para atualização do estoque no bd
-        for variacao in bd_variacoes:
-
-            # obtendo o id da variação da iteração atual
-            vid = str(variacao.id)
-
-            # obtendo a quantidade inserida no carrinho
-            qtd_cart = cart[vid]['qtd']
-
-            # atualizando o estoque
-            variacao.estoque = variacao.estoque - qtd_cart
-
-        # atualizando os registros em lote no bd
-        Variacao.objects.bulk_update(bd_variacoes, fields = ['estoque'])
+       
 
         # criando o objeto Pedido com os dados do carrinho
-        pedido = Pedido(
+        pedido = Pedido.objects.create(
             id_usuario=self.request.user,
             total=price_total_cart,
             quantidade=qtd_items_cart,
             status='C',
         )
-
-        # salvando no bd
-        pedido.save()
 
         # criando os registros dos itens do pedido
         # iterando sobre as variações presentes no carrinho
@@ -208,22 +192,48 @@ class Save(View):
             ]
         )
 
+        # HACK
+        # # passo para decremento do estoque disponível
+        # # iterando sobre o array de variações para atualização do estoque no bd
+        # for variacao in bd_variacoes:
+
+        #     # obtendo o id da variação da iteração atual
+        #     vid = str(variacao.id)
+
+        #     # obtendo a quantidade inserida no carrinho
+        #     qtd_cart = cart[vid]['qtd']
+
+        #     # atualizando o estoque
+        #     variacao.estoque = variacao.estoque - qtd_cart
+
+        # # atualizando os registros em lote no bd
+        # Variacao.objects.bulk_update(bd_variacoes, fields = ['estoque'])
+
         # apagando o carrinho da sessão
         del self.request.session['cart']
 
-        # # redireciona para a página do pedido
-        # return redirect(
-        #     reverse(
-        #         'pedido:pay',
-        #         kwargs={
-        #             'pk': pedido.pk
-        #         }
-        #     )
-        # )
+        # salvando a sessão
+        self.request.session.save()
 
-        # redireciona para a página do carrinho
-        return redirect('produto:showcart')
+        # redireciona para a página do pedido
+        return redirect(
+            # construindo a url para a página do pedido
+            reverse(
+                'pedido:pay',
+                kwargs={
+                    'pk': pedido.pk
+                }
+            )
+        )
 
+
+# definindo a view List
+class List(ListView):
+    model = Pedido
+    context_object_name = 'pedidos'
+    template_name = 'pedido/list.html'
+    paginate_by = 10
+    ordering = ['-id']
 
 # definindo a view Detail
 class Detail(View):

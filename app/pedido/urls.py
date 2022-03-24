@@ -11,9 +11,11 @@ app_name = 'pedido'
 # definindo os endpoints do app
 urlpatterns = [
     # definindo o endpoint de pagamento de pedidos
-    path('', views.Pay.as_view(), name='pay'),
-    # definindo o endpoint de fechamento de pedidos
+    path('pay/<int:pk>', views.Pay.as_view(), name='pay'),
+    # definindo o endpoint de salvamento de pedidos
     path('save/', views.Save.as_view(), name='save'),
+    # definindo o endpoint de listagem de pedidos
+    path('list/', views.List.as_view(), name='list'),
     # definindo o endpoint de detalhe de pedidos
-    path('detail/', views.Detail.as_view(), name='login'),
+    path('detail/<int:pk>', views.Detail.as_view(), name='detail'),
 ]

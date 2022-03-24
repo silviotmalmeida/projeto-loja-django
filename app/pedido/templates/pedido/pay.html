@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {# definindo o title a ser inserido no base.html #}
-{% block title %}Salvar Pedido{% endblock %}
+{% block title %}Pagar Pedido{% endblock %}
 
 {# carregando o módulo de filtros personalizados #}
 {% load customizedFilters %}
@@ -19,9 +19,9 @@
     </div>
 </div>
 
+{# renderizando a tabela com os dados do pedido #}
 <div class="row">
     <div class="col">
-        <h3>{{ pedido }}</h3>
 
         <div class="row mt-4">
             <div class="col-lg-2 font-weight-bold">Número do pedido:</div>
@@ -29,8 +29,8 @@
             <div class="col-lg-2 font-weight-bold">Total a pagar:</div>
             <div class="col-lg-4">{{ pedido.total|currency_format }}</div>
 
-            <div class="col-lg-2 font-weight-bold">QTD. Itens:</div>
-            <div class="col-lg-4">{{ pedido.qtd_total }}</div>
+            <div class="col-lg-2 font-weight-bold">Quantidade de Itens:</div>
+            <div class="col-lg-4">{{ pedido.quantidade }}</div>
             <div class="col-lg-2 font-weight-bold">Status:</div>
             <div class="col-lg-4">{{ pedido.get_status_display }}</div>
         </div>
@@ -41,29 +41,34 @@
             </div>
         </div>
 
+        {# renderizando a tabela com os itens do pedido #}
         <div class="table-responsive mt-3">
             <table class="table">
                 <tr>
                     <th class="d-none d-lg-block">Imagem</th>
                     <th>Produto</th>
-                    <th>V.</th>
-                    <th>QTD.</th>
-                    <th>Total</th>
+                    <th>Variação</th>
+                    <th>Quantidade</th>
+                    <th>Preço Unitário</th>
                 </tr>
 
+                {# iterando sobre o array de itens do pedido #}
                 {% for linha in pedido.itempedido_set.all %}
                 <tr>
                     <td class="d-none d-lg-block">
                         <img class="cart-img" src="{% get_media_prefix %}{{ linha.imagem }}">
                     </td>
-                    <td>{{ linha.produto }}</td>
-                    <td>{{ linha.variacao }}</td>
+                    <td>{{ linha.nome_produto }}</td>
+                    <td>{{ linha.nome_variacao }}</td>
                     <td>{{ linha.quantidade }}</td>
                     <td>
+                        {# se existir preço promocional, considera-o #}
                         {% if linha.preco_promocional %}
-                        {{ linha.preco_promocional|currency_format }}
+                            {{ linha.preco_promocional|currency_format }}
+
+                        {# senão, considera o preço #}
                         {% else %}
-                        {{ linha.preco|currency_format }}
+                            {{ linha.preco|currency_format }}
                         {% endif %}
                     </td>
                 </tr>
@@ -74,6 +79,7 @@
     </div>
 </div>
 
+{# renderizando o botão de pagar #}
 <div class="row mt-4">
     <div class="col">
         <a href="#" class="btn btn-primary btn-block btn-lg">Pagar</a>
