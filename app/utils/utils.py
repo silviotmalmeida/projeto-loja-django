@@ -63,3 +63,17 @@ def age(birth_date):
 
     # retorna a idade calculada
     return age
+
+
+# função que calcula o valor total de um item de pedido
+def calculate_total_price(item_pedido):
+
+    # se existir preço promocional, considera-o
+    if(item_pedido.preco_promocional):
+        # retorna o preco total
+        return item_pedido.quantidade * item_pedido.preco_promocional
+
+    # senão considera o preço
+    else:
+        # retorna o preco total
+        return item_pedido.quantidade * item_pedido.preco

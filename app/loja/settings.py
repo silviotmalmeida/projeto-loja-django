@@ -159,7 +159,7 @@ MESSAGE_TAGS = {
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # definindo as regras da sessão
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # duração da sessão
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # duração da sessão em segundos
 # regra para salvar automaticamente a sessão a cada requisição
 SESSION_SAVE_EVERY_REQUEST = False
 # SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer' # alteração do serializador default para permitir salvar objetos na sessão

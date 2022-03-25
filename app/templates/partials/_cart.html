@@ -12,10 +12,10 @@
         {# cabeçalho da tabela #}
         <tr>
             <th class="d-none d-lg-block">Imagem</th>
-            <th>Produto</th>
-            <th>Variação</th>
-            <th>Quantidade</th>
-            <th>Total</th>
+            <th class="text-center">Produto</th>
+            <th class="text-center">Variação</th>
+            <th class="text-center">Quantidade</th>
+            <th class="text-center">Total</th>
         </tr>
 
         {# iterando pelos itens do carrinho #}
@@ -27,7 +27,7 @@
             </td>
 
             {# link do produto #}
-            <td>
+            <td class="text-center">
                 {# nome do produto #}
                 <a href="{% url 'produto:detail' item.slug %}">
                     {{ item.produto_nome }}
@@ -39,31 +39,33 @@
             </td>
 
             {# nome da variação #}
-            <td>{{ item.variacao_nome }}</td>
+            <td class="text-center">{{ item.variacao_nome }}</td>
 
             {# quantidade #}
-            <td>
+            <td class="text-center">
                 {{ item.qtd }} x
 
                 {# se existir preço promocional, considera-o #}
                 {% if item.preco_unitario_promocional %}
-                    {{ item.preco_unitario_promocional }}
+                    {{ item.preco_unitario_promocional|currency_format }}
 
                 {# senão, considera o preço #}
                 {% else %}                
-                    {{ item.preco_unitario }}
+                    {{ item.preco_unitario|currency_format }}
                 {% endif %}
             </td>
 
             {# total #}
-            {# se existir preço total promocional, considera-o #}
-            {% if item.preco_total_promocional %}
-                <td>{{ item.preco_total_promocional }}</td>
+            <td class="text-center">
+                {# se existir preço total promocional, considera-o #}
+                {% if item.preco_total_promocional %}
+                    {{ item.preco_total_promocional|currency_format }}
 
-            {# senão, considera o preço total #}
-            {% else %}
-                <td>{{ item.preco_total }}</td>
+                {# senão, considera o preço total #}
+                {% else %}
+                    {{ item.preco_total|currency_format }}
             {% endif %}
+            </td>
 
         </tr>
         {% endfor %}

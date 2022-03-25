@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 
 {# definindo o title a ser inserido no base.html #}
-{% block title %}Pagar Pedido{% endblock %}
+{% block title %}Detalhe do {{ pedido }}{% endblock %}
 
 {# carregando o módulo de filtros personalizados #}
 {% load customizedFilters %}
@@ -13,22 +13,7 @@
 {# criando o bloco content a ser inserido no base.html #}
 {% block content %}
 
-<div class="row">
-    <div class="col">
-        <h3>Escolha o método de pagamento</h3>
-        <p>Para o desenvolvedor: adicione seu método de pagamento preferido.</p>
-    </div>
-</div>
-
 {# carregando a tabela do pedido definida em partials/_pedido.html #}
 {% include 'partials/_pedido.html' %}
-
-{# renderizando o botão de pagar #}
-<div class="row mt-4">
-    <div class="col">
-        <a href="#" class="btn btn-primary btn-block btn-lg">Pagar</a>
-    </div>
-</div>
-
 
 {% endblock %}

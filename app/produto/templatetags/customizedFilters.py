@@ -48,3 +48,13 @@ def sum_prices(value):
 def age(value):
 
     return utils.age(value)
+
+
+# criando o filtro reponsável por calcular o valor total de um item de pedido
+# decorando a função como um filtro chamado calculate_total_price
+@register.filter(name='calculate_total_price')
+# criando a função
+# o argumento a ser recebido é o texto antes do pipe
+def calculate_total_price(value):
+
+    return utils.calculate_total_price(value)

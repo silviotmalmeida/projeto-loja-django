@@ -2,6 +2,8 @@
 from django.db import models
 # importando a model de usuário da área administrativa do django
 from django.contrib.auth.models import User
+# importando a biblioteca de hora e data
+from django.utils import timezone
 
 
 # criando a model de Pedido
@@ -10,6 +12,9 @@ class Pedido(models.Model):
     # criando o atributo id_usuario com referência à model Produto, com deleção em cascata
     id_usuario = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Usuário')
+
+    # criando o atributo data como datetime atual
+    data = models.DateTimeField(default=timezone.now, verbose_name='Data')
 
     # criando o atributo total como float
     total = models.FloatField(verbose_name='Valor Total (R$)')

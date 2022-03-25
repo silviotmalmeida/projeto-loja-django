@@ -48,6 +48,9 @@ class List(ListView):
     # determinando o nome do objeto a ser passado ao template
     context_object_name = 'produtos'
 
+    # ordenando os resultados pelo id de forma decrescente
+    ordering = ['-id']
+
 
 # definindo a view Detail
 class Detail(DetailView):
@@ -374,7 +377,7 @@ def loadtestdata(request):
             )
 
             # criando os carrinhos
-            for y in range(randint(0, 5)):
+            for y in range(randint(0, 20)):
 
                 # inicializando o carrinho vazio
                 cart = {}

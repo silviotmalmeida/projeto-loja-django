@@ -19,8 +19,37 @@ from django.contrib import messages
 from utils import utils
 
 
+# criando middleware para verificar se o usuário está logado
+# e filtrar as consultas por este usuário logado
+class DispatchLoginRequiredMixin(View):
+    # customizando o método dispatch
+    def dispatch(self, *args, **kwargs):
+
+        # se o usuário não estiver logado
+        if not self.request.user.is_authenticated:
+            # redireciona para a página de login
+            return redirect('perfil:create')
+
+        # retornando a classe
+        return super().dispatch(*args, **kwargs)
+
+    # customizando a query padrão
+    def get_queryset(self, *args, **kwargs):
+
+        # herdando o comportamento padrão
+        qs = super().get_queryset(*args, **kwargs)
+
+        # filtrando os resultados pelo usuário logado
+        qs = qs.filter(id_usuario=self.request.user)
+
+        # retornando a query customizada
+        return qs
+
+
 # definindo a view Pay
-class Pay(DetailView):
+# só terá acesso a página usuários logados
+# os reultados serão filtrados para este usuário logado
+class Pay(DispatchLoginRequiredMixin, DetailView):
 
     # definindo o template a ser utilizado
     template_name = 'pedido/pay.html'
@@ -164,7 +193,6 @@ class Save(View):
 
         # obtendo o valor total dos itens no carrinho
         price_total_cart = round(utils.sum_prices(cart), 2)
-       
 
         # criando o objeto Pedido com os dados do carrinho
         pedido = Pedido.objects.create(
@@ -228,13 +256,39 @@ class Save(View):
 
 
 # definindo a view List
-class List(ListView):
-    model = Pedido
-    context_object_name = 'pedidos'
+# só terá acesso a página usuários logados
+# os resultados serão filtrados para este usuário logado
+class List(DispatchLoginRequiredMixin, ListView):
+
+    # definindo o template a ser utilizado
     template_name = 'pedido/list.html'
+
+    # definindo a model a ser utilizada
+    model = Pedido
+
+    # determinando o nome do objeto a ser passado ao template
+    context_object_name = 'pedidos'
+
+    # definindo a quantidade de itens por página
     paginate_by = 10
+
+    # ordenando os resultados pelo id de forma decrescente
     ordering = ['-id']
 
+
 # definindo a view Detail
-class Detail(View):
-    pass
+# só terá acesso a página usuários logados
+# os resultados serão filtrados para este usuário logado
+class Detail(DispatchLoginRequiredMixin, DetailView):
+    
+    # definindo o template a ser utilizado
+    template_name = 'pedido/detail.html'
+
+    # definindo a model a ser utilizada
+    model = Pedido
+
+    # determinando o termo a ser considerado como id na definição da url
+    pk_url_kwarg = 'pk'
+
+    # determinando o nome do objeto a ser passado ao template
+    context_object_name = 'pedido'
