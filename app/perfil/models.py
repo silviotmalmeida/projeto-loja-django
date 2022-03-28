@@ -20,8 +20,8 @@ class Perfil(models.Model):
     # criando o atributo data_nascimento como data
     data_nascimento = models.DateField(verbose_name='Data de Nascimento')
 
-    # criando o atributo cpf como texto com tamanho máximo de 11
-    cpf = models.CharField(max_length=11, verbose_name='CPF(somente números)')
+    # criando o atributo cpf como texto único, com tamanho máximo de 11
+    cpf = models.CharField(unique=True, max_length=11, verbose_name='CPF(somente números)')
 
     # criando o atributo logradouro como texto com tamanho máximo de 50
     logradouro = models.CharField(max_length=50, verbose_name='Logradouro')
@@ -85,13 +85,20 @@ class Perfil(models.Model):
         # inicializando o dicionário de erros
         error_messages = {}
 
-        # se o CEP for inválido, popula o dicionário de erros
-        if not valida_cep(self.cep):
-            error_messages['cep'] = 'Digite um CEP válido (somente números)'
+        # consultando se o cpf já é utilizado
+        perfil_db = Perfil.objects.filter(cpf=self.cpf).first()
+
+        # se o cpf já estiver sendo utilizado por outro perfil
+        if perfil_db and self.id != perfil_db.id:
+            error_messages['cpf'] = 'CPF já está sendo utilizado por outro usuário'
 
         # se o CPF for inválido, popula o dicionário de erros
         if not valida_cpf(self.cpf):
             error_messages['cpf'] = 'Digite um CPF válido (somente números)'
+
+        # se o CEP for inválido, popula o dicionário de erros
+        if not valida_cep(self.cep):
+            error_messages['cep'] = 'Digite um CEP válido (somente números)'
 
         # se existirem erros, levanta a exceção
         if error_messages:

@@ -22,6 +22,9 @@ from perfil.models import Perfil
 # importando a model Pedido e ItemPedido
 from pedido.models import Pedido, ItemPedido
 
+# importando a biblioteca de queries avançadas do django
+from django.db.models import Q
+
 # importação biblioteca de funções genéricas
 from utils import utils
 
@@ -43,13 +46,47 @@ class List(ListView):
     template_name = 'produto/list.html'
 
     # definindo a quantidade de itens por página
-    paginate_by = 6
+    paginate_by = 3
 
     # determinando o nome do objeto a ser passado ao template
     context_object_name = 'produtos'
 
     # ordenando os resultados pelo id de forma decrescente
     ordering = ['-id']
+
+
+# definindo a view Search
+class Search(List):
+
+    # sobrescrevendo a queryset padrão da view List
+    def get_queryset(self, *args, **kwargs):
+
+        # obtendo o termo de busca a partir da url ou da sessão
+        search_term = self.request.GET.get(
+            'search_term') or self.request.session['search_term']
+
+        # obtendo a queryset default
+        qs = super().get_queryset(*args, **kwargs)
+
+        # se não existir o termo de busca
+        if not search_term:
+            # retorna a queryset padrão
+            return qs
+
+        # atualizando a sessão
+        self.request.session['search_term'] = search_term
+        self.request.session.save()
+
+        # filtrando os resultados dos produtos
+        qs = qs.filter(
+
+            # se os campos contiverem o temo de busca
+            Q(nome__icontains=search_term) |
+            Q(descricao_curta__icontains=search_term) |
+            Q(descricao_longa__icontains=search_term)
+        )
+        # retorna a queryset customizada
+        return qs
 
 
 # definindo a view Detail

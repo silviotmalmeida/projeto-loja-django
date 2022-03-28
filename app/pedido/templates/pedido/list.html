@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 
 {# definindo o title a ser inserido no base.html #}
-{% block title %}Meus Pedidos{% endblock %}
+{% block title %}Pedidos de {{ user }} {% endblock %}
 
 {# carregando o módulo de filtros personalizados #}
 {% load customizedFilters %}
@@ -15,42 +15,56 @@
 
         {# renderizando o nome do usuário #}
         <h3 class="mb-4">Pedidos de {{ user }}</h3>
-        <p>Abaixo todos os seus pedidos realizados:</p>
 
-        {# renderizando a tabela dos pedidos #}
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <tr>
-                    <th scope="col" class="text-center">Pedido</th>
-                    <th scope="col" class="text-center">Data</th>
-                    <th scope="col" class="text-center">Total</th>
-                    <th scope="col" class="text-center">Quantidade de Itens</th>
-                    <th scope="col" class="text-center">Status</th>
-                    <th scope="col" class="text-center">Mais detalhes</th>
-                </tr>
+        {# se existirem pedidos do usuário logado #}
+        {% if pedidos %}
 
-                {# iterando sobre o array de pedidos #}
-                {% for pedido in pedidos %}
-                <tr>
-                    <th scope="row" class="text-center">{{ pedido }}</td>
-                    <td class="text-center">{{ pedido.data }}</td>
-                    <td class="text-center">{{ pedido.total|currency_format }}</td>
-                    <td class="text-center">{{ pedido.quantidade }}</td>
-                    <td class="text-center">{{ pedido.get_status_display }}</td>
-                    <td class="text-center">
-                        <a href="{% url 'pedido:detail' pedido.id %}">
-                            Ver <i class="fas fa-search-plus ml-2"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
+            <p>Abaixo todos os seus pedidos realizados:</p>
+
+            {# renderizando a tabela dos pedidos #}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <tr>
+                        <th scope="col" class="text-center">Pedido</th>
+                        <th scope="col" class="text-center">Data</th>
+                        <th scope="col" class="text-center">Total</th>
+                        <th scope="col" class="text-center">Quantidade de Itens</th>
+                        <th scope="col" class="text-center">Status</th>
+                        <th scope="col" class="text-center">Mais detalhes</th>
+                    </tr>
+
+                    {# iterando sobre o array de pedidos #}
+                    {% for pedido in pedidos %}
+                    <tr>
+                        <th scope="row" class="text-center">{{ pedido }}</td>
+                        <td class="text-center">{{ pedido.data }}</td>
+                        <td class="text-center">{{ pedido.total|currency_format }}</td>
+                        <td class="text-center">{{ pedido.quantidade }}</td>
+                        <td class="text-center">{{ pedido.get_status_display }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'pedido:detail' pedido.id %}">
+                                Ver <i class="fas fa-search-plus ml-2"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
 
 
-            </table>
-        </div>
+                </table>
+            </div>
+
+        {# senão #}
+        {% else %}
+
+            {# renderizando mensagem #}
+            <p class="lead">Nenhum pedido realizado.</p>
+
+        {% endif %}
+
     </div>
 </div>
 
+{# carregando a paginação definida em partial/_pagination.html #}
 {% include 'partials/_pagination.html' %}
 
 {% endblock %}

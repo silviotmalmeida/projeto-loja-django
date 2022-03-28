@@ -5,7 +5,7 @@
 {% load customizedFilters %}
 
 {# definindo o title a ser inserido no base.html #}
-{% block title %}Detalhe do Produto{% endblock %}
+{% block title %} {{ produto.nome }}{% endblock %}
 
 {# criando o bloco content a ser inserido no base.html #}
 {% block content %}
