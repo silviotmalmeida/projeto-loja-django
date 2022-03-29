@@ -54,6 +54,31 @@ class List(ListView):
     # ordenando os resultados pelo id de forma decrescente
     ordering = ['-id']
 
+    # sobrescrevendo a queryset padrão da ListView
+    def get_queryset(self, *args, **kwargs):
+
+        # obtendo o termo de busca a partir da url ou da sessão
+        search_term = self.request.GET.get('search_term')
+
+        # obtendo a queryset default
+        qs = super().get_queryset(*args, **kwargs)
+
+        # se não existir o termo de busca
+        if not search_term:
+            # retorna a queryset padrão
+            return qs
+
+        # filtrando os resultados dos produtos
+        qs = qs.filter(
+
+            # se os campos contiverem o temo de busca
+            Q(nome__icontains=search_term) |
+            Q(descricao_curta__icontains=search_term) |
+            Q(descricao_longa__icontains=search_term)
+        )
+        # retorna a queryset customizada
+        return qs
+
 
 # definindo a view Search
 class Search(List):

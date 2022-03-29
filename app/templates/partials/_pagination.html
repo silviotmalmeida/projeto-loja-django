@@ -9,13 +9,15 @@
         {% if page_obj.has_previous %}
 
             {# desenha o botão de navegação para a primeira página (<<) #}
+            {# se existir o atributo search_term na url de origem, insere na url da paginação #}
             <li class="page-item">
-                <a class="page-link" href="?page=1">&laquo;</a>
+                <a class="page-link" href="?page=1{% if request.GET.search_term %}&search_term={{ request.GET.search_term }}{% endif %}">&laquo;</a>
             </li>
 
             {# desenha o botão de navegação para a página anterior (<) #}
+            {# se existir o atributo search_term na url de origem, insere na url da paginação #}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search_term %}&search_term={{ request.GET.search_term }}{% endif %}">&lsaquo;</a>
             </li>
 
         {% endif %}
@@ -27,16 +29,18 @@
             {% if page_obj.number == num %}
 
                 {# desenha o botão da página atual com estilização diferenciada #}
+                {# se existir o atributo search_term na url de origem, insere na url da paginação #}
                 <li class="page-item active">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.search_term %}&search_term={{ request.GET.search_term }}{% endif %}">{{ num }}</a>
                 </li>
 
             {# se não for a página atual, mas estiver a 3 posições da página atual #}
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                 
                 {# desenha o botão da referida página #}
+                {# se existir o atributo search_term na url de origem, insere na url da paginação #}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.search_term %}&search_term={{ request.GET.search_term }}{% endif %}">{{ num }}</a>
                 </li>
                 
             {% endif %}
@@ -47,13 +51,15 @@
         {% if page_obj.has_next %}
 
             {# desenha o botão de navegação para a página posterior (>) #}
+            {# se existir o atributo search_term na url de origem, insere na url da paginação #}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search_term %}&search_term={{ request.GET.search_term }}{% endif %}">&rsaquo;</a>
             </li>
 
             {# desenha o botão de navegação para a última página (>>) #}
+            {# se existir o atributo search_term na url de origem, insere na url da paginação #}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search_term %}&search_term={{ request.GET.search_term }}{% endif %}">&raquo;</a>
             </li>
 
         {% endif %}

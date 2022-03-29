@@ -77,10 +77,10 @@
     </ul>
 
     {# formulário de busca #}
-    <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'produto:search' %}">
+    <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'produto:list' %}">
       <input
         name="search_term"
-        value="{{ request.session.search_term }}"
+        value="{{ request.GET.search_term }}"
         class="form-control mr-sm-2"
         type="search"
         placeholder="Digite um termo de busca"
